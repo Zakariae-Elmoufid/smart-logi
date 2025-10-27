@@ -1,0 +1,13 @@
+package com.example.SmartLogi.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class HelloController {
+
+    @GetMapping("/index")
+    public String hello(){
+        return "HelloController SmartLogi!";
+    }
+}
