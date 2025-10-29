@@ -1,4 +1,4 @@
-package com.example.SmartLogi.controller;
+package com.example.SmartLogi.controllers;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class HelloController {
 
-    @GetMapping("/index")
+    @GetMapping("/hello")
     public String hello(){
-        return "HelloController SmartLogi!";
+        return "hello salam";
     }
 }
