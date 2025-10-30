@@ -1,7 +1,9 @@
 package com.example.SmartLogi.dto;
 
-public record ClientResponseDTO(Long id, String firstName, String lastName, String email) {
-}
+import java.time.LocalDateTime;
+
+public record  ClientResponseDTO(Long id, String firstName, String lastName, String email, LocalDateTime createdAt, String phoneNumber, String role, boolean active)
+{}
 
 
 
