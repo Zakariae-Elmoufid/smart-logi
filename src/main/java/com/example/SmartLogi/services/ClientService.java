@@ -33,13 +33,12 @@ public class ClientService {
                 .firstName(dto.firstName())
                 .lastName(dto.lastName())
                 .email(dto.email())
-                .password(PasswordUtils.hash(dto.password())) // ✅ hash password
+                .password(PasswordUtils.hash(dto.password()))
                 .phoneNumber(dto.phoneNumber())
                 .role(UserRole.CLIENT)
                 .createdAt(LocalDateTime.now())
                 .active(true)
                 .build();
-
         return clientMapper.toDto(clientRepository.save(client));
     }
 }

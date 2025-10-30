@@ -4,8 +4,15 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import lombok.*;
+
 import java.time.LocalDateTime;
 
+@Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "products")
 public class Product {
@@ -40,65 +47,5 @@ public class Product {
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
-     public Product() {}
-    // --- Getters & Setters ---
-    public Long getId() {
-        return id;
-    }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getSku() {
-        return sku;
-    }
-
-    public void setSku(String sku) {
-        this.sku = sku;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Category getCategory() {
-        return category;
-    }
-
-    public void setCategory(Category category) {
-        this.category = category;
-    }
-
-    public Double getPurchasePrice() {
-        return purchasePrice;
-    }
-
-    public void setPurchasePrice(Double purchasePrice) {
-        this.purchasePrice = purchasePrice;
-    }
-
-    public Double getSellingPrice() {
-        return sellingPrice;
-    }
-
-    public void setSellingPrice(Double sellingPrice) {
-        this.sellingPrice = sellingPrice;
-    }
-
-    public Boolean getActive() {
-        return active;
-    }
-
-    public void setActive(Boolean active) {
-        this.active = active;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
 }
