@@ -20,11 +20,13 @@ public class UserService {
     private UserMapper userMapper;
 
     public UserResponseDTO findUserByEmailAndByPassword(UserRequestDTO dto){
-         User user  = userMapper.toEntity(dto);
-        User userExiste  = userRepository.findByEmail(user.getEmail()).orElseThrow(() -> new RuntimeException("User not found"));;
-        if(!PasswordUtils.verify(dto.password(),userExiste.getPassword())){
-             throw new RuntimeException("Invalid   password");
-         }
-        return userMapper.toDto(userExiste);
+        User user = userRepository.findByEmail(dto.email())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!PasswordUtils.verify(dto.password(), user.getPassword())) {
+            throw new RuntimeException("Invalid password");
+        }
+
+        return userMapper.toDto(user);
     }
 }
