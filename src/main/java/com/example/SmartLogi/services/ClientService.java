@@ -12,6 +12,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 
 @Service
 public class ClientService {
@@ -26,8 +28,18 @@ public class ClientService {
 
 
     public ClientResponseDTO createClient(ClientRequestDTO dto) {
-        Client client = clientMapper.toEntity(dto);
-        client.setPassword(PasswordUtils.hash(dto.password()));
+//        Client client = clientMapper.toEntity(dto);
+        Client client = Client.builder()
+                .firstName(dto.firstName())
+                .lastName(dto.lastName())
+                .email(dto.email())
+                .password(PasswordUtils.hash(dto.password())) // ✅ hash password
+                .phoneNumber(dto.phoneNumber())
+                .role(UserRole.CLIENT)
+                .createdAt(LocalDateTime.now())
+                .active(true)
+                .build();
+
         return clientMapper.toDto(clientRepository.save(client));
     }
 }
