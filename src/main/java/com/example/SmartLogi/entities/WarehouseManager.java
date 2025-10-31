@@ -32,6 +32,9 @@ public class WarehouseManager extends User {
     private Set<Warehouse> warehouses = new HashSet<>();
 
     public void addWarehouse(Warehouse warehouse) {
+        if (this.warehouses == null) {
+            this.warehouses = new HashSet<>();
+        }
         this.warehouses.add(warehouse);
         warehouse.getManagers().add(this);
     }
