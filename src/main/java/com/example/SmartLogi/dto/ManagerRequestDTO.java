@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 
+import java.util.Set;
 
 
 public record ManagerRequestDTO (
@@ -27,7 +28,9 @@ public record ManagerRequestDTO (
 
         @NotBlank(message = "Phone number is required")
         @Pattern(regexp = "\\+?\\d{10,15}", message = "Phone number must be numeric and 10-15 digits")
-        String phoneNumber
+        String phoneNumber,
+
+        Set<Long> warehouseIds
 
 ) {}
 
