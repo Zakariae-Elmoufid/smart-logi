@@ -87,6 +87,20 @@ public class ProductController {
     }
 
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse> deleteProduct(@PathVariable Long id) {
+        boolean deleted = productService.deleteProduct(id);
+
+        ApiResponse response = ApiResponse.builder()
+                .message(deleted ? "Product deleted successfully" : "Product not found")
+                .status(deleted ? HttpStatus.OK.value() : HttpStatus.NOT_FOUND.value())
+                .build();
+
+        return new ResponseEntity<>(response, deleted ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    }
+
+
+
 
 
 

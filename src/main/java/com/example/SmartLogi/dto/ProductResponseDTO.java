@@ -1,8 +1,11 @@
 package com.example.SmartLogi.dto;
 
-import java.time.LocalDateTime;
+import com.example.SmartLogi.entities.Category;
 
-public record ProductResponseDTO(long id , long categoryId, String name, String sku,double purchasePrice, double sellingPrice, boolean active,
+import java.time.LocalDateTime;
+import java.util.Locale;
+
+public record ProductResponseDTO(long id , String categoryName, String name, String sku, double purchasePrice, double sellingPrice, boolean active,
                                  LocalDateTime createdAt) {
 }
 

@@ -1,5 +1,6 @@
 package com.example.SmartLogi.services;
 
+import com.example.SmartLogi.dto.ApiResponse;
 import com.example.SmartLogi.dto.ProductRequestDTO;
 import com.example.SmartLogi.dto.ProductResponseDTO;
 import com.example.SmartLogi.entities.Category;
@@ -9,7 +10,10 @@ import com.example.SmartLogi.repositories.CategoryRepository;
 import com.example.SmartLogi.repositories.ProductRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -47,7 +51,7 @@ public class ProductService {
     }
 
     public List<ProductResponseDTO> getAllProducts(){
-        return repository.findAll()
+        return  repository.findAll()
                 .stream()
                 .map(mapper::toDTO)
                 .toList();
@@ -73,6 +77,15 @@ public class ProductService {
 
         return mapper.toDTO(repository.save(product));
     }
+
+
+    public boolean deleteProduct(Long id) {
+            if (!repository.existsById(id)) return false;
+            repository.deleteById(id);
+            return true;
+
+    }
+
 
 
 
