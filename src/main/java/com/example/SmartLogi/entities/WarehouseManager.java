@@ -13,16 +13,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-@Entity
 @Table(name = "warehouse_manager")
-public class WarehouseManager
-        extends User
-{
+public class WarehouseManager extends User {
 
 
     @ManyToMany(fetch = FetchType.LAZY)

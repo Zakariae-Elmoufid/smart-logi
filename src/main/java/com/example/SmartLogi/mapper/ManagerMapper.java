@@ -12,6 +12,5 @@ import org.mapstruct.factory.Mappers;
 
 public interface ManagerMapper {
     ManagerResponseDTO toDTO(WarehouseManager manager);
-    Manager toEntity(ManagerRequestDTO managerRequestDTO);
-
+    WarehouseManager toEntity(ManagerRequestDTO managerRequestDTO);
 }

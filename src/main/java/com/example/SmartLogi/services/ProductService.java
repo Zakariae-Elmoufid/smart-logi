@@ -74,7 +74,6 @@ public class ProductService {
                 .orElseThrow(() -> new RuntimeException("Category not found"));
         product.setCategory(category);
         product.setActive(dto.active());
-
         return mapper.toDTO(repository.save(product));
     }
 

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/managers")
+@RequestMapping("/api/admin/managers")
 public class WarehouseManagerController {
 
     @Autowired
