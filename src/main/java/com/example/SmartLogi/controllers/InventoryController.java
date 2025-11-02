@@ -69,6 +69,7 @@ public class InventoryController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
+
     @PostMapping("/adjustment")
     public  ResponseEntity<ApiResponse> recordAdjustment(@Valid @RequestBody InventoryMovementRequestDTO dto){
         InventoryMovementResponseDTO  inventoryMovment = inventoryService.recordAdjustment(dto);
