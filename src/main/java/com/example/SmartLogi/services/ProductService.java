@@ -40,7 +40,7 @@ public class ProductService {
         Product product = Product.builder()
                 .sku(dto.sku())
                 .name(dto.name())
-                .category(category) // set the real entity
+                .category(category)
                 .purchasePrice(dto.purchasePrice())
                 .sellingPrice(dto.sellingPrice())
                 .active(dto.active())
@@ -74,7 +74,6 @@ public class ProductService {
                 .orElseThrow(() -> new RuntimeException("Category not found"));
         product.setCategory(category);
         product.setActive(dto.active());
-
         return mapper.toDTO(repository.save(product));
     }
 
