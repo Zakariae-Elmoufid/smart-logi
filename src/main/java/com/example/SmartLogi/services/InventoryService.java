@@ -78,4 +78,20 @@ public class InventoryService {
          return  inventoryMovementMapper.toDTO(movementRepository.save(inventoryMovement));
     }
 
+    @Transactional
+    public InventoryMovementResponseDTO recordOutbound(InventoryMovementRequestDTO dto) {
+       Inventory inventory = inventoryRepository.findById(dto.inventoryId())
+               .orElseThrow(() -> new ResourceNotFoundException("Inventory not found"));
+       inventory.setQuantityOnHand(inventory.getQuantityOnHand() - dto.quantity());
+       inventoryRepository.save(inventory);
+
+       InventoryMovement inventoryMovement = InventoryMovement.builder()
+               .inventory(inventory)
+               .movementType(MovementType.OUTBOUND)
+               .quantity(dto.quantity())
+               .createdAt(LocalDateTime.now())
+               .build();
+       return  inventoryMovementMapper.toDTO(movementRepository.save(inventoryMovement));
+    }
+
 }

@@ -37,4 +37,15 @@ public class InventoryController {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+
+    @PostMapping("/outbound")
+    public ResponseEntity<ApiResponse> recordOutbound(@RequestBody InventoryMovementRequestDTO dto) {
+        InventoryMovementResponseDTO inventoryMovement = inventoryService.recordOutbound(dto);
+        ApiResponse response = ApiResponse.builder()
+                .message("Outbound recorded successfully")
+                .data(inventoryMovement)
+                .status(HttpStatus.CREATED.value())
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
 }
