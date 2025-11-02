@@ -7,7 +7,7 @@ public record InventoryMovementRequestDTO (
     @NotNull(message = "inventoryId is required")
     Long inventoryId,
 
-    @Min(value = 1, message = "quantity must be greater than 0")
+    @NotNull(message = "quantity is required")
     int quantity
             ){
 }

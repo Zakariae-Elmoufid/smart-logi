@@ -24,6 +24,7 @@ import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Service
@@ -61,9 +62,24 @@ public class InventoryService {
    }
 
 
+   public  InventoryResponseDTO getById(long id) {
+      Inventory inventory = inventoryRepository.findById(id)
+              .orElseThrow(() -> new ResourceNotFoundException("Inventory not found"));
+      return mapper.toDto(inventory);
+   }
+
+   public List<InventoryResponseDTO> getAll() {
+       List<Inventory> inventory = inventoryRepository.findAll();
+       return   inventory.stream().map(mapper::toDto).toList();
+   }
+
+
 
     @Transactional
     public InventoryMovementResponseDTO recordInbound(InventoryMovementRequestDTO dto) {
+        if(dto.quantity() <= 0){
+            throw  new BusinessException("quantity  must be  greater than inventory quantity");
+        }
         Inventory inventory = inventoryRepository.findById(dto.inventoryId())
                 .orElseThrow(() -> new ResourceNotFoundException("Inventory not found"));
 
@@ -82,8 +98,17 @@ public class InventoryService {
     public InventoryMovementResponseDTO recordOutbound(InventoryMovementRequestDTO dto) {
        Inventory inventory = inventoryRepository.findById(dto.inventoryId())
                .orElseThrow(() -> new ResourceNotFoundException("Inventory not found"));
+       if(dto.quantity() <= 0){
+           throw  new BusinessException("quantity  must be  greater than inventory quantity");
+       }
+
+       if(inventory.getQuantityOnHand() < dto.quantity()){
+          throw  new BusinessException("quantity is greater than inventory quantity");
+       }
+
        inventory.setQuantityOnHand(inventory.getQuantityOnHand() - dto.quantity());
        inventoryRepository.save(inventory);
+
 
        InventoryMovement inventoryMovement = InventoryMovement.builder()
                .inventory(inventory)
@@ -92,6 +117,34 @@ public class InventoryService {
                .createdAt(LocalDateTime.now())
                .build();
        return  inventoryMovementMapper.toDTO(movementRepository.save(inventoryMovement));
+    }
+
+    @Transactional
+    public InventoryMovementResponseDTO recordAdjustment(InventoryMovementRequestDTO dto) {
+        Inventory inventory = inventoryRepository.findById(dto.inventoryId())
+                .orElseThrow(() -> new ResourceNotFoundException("Inventory not found"));
+
+        int qtyOnHand = inventory.getQuantityOnHand();
+        int qtyReserved = inventory.getQuantityReserved();
+        int adjustmentQty = dto.quantity();
+
+        if (adjustmentQty < 0 && (qtyOnHand + adjustmentQty) < qtyReserved) {
+            throw new BusinessException("Adjustment refused: qtyOnHand cannot be less than qtyReserved.");
+        }
+
+        inventory.setQuantityOnHand(qtyOnHand + adjustmentQty);
+        inventoryRepository.save(inventory);
+
+        InventoryMovement movement = InventoryMovement.builder()
+                .inventory(inventory)
+                .movementType(MovementType.ADJUSTMENT)
+                .quantity(adjustmentQty)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        movementRepository.save(movement);
+
+        return inventoryMovementMapper.toDTO(movement);
     }
 
 }
