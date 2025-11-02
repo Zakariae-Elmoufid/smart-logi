@@ -141,9 +141,7 @@ public class InventoryService {
                 .quantity(adjustmentQty)
                 .createdAt(LocalDateTime.now())
                 .build();
-
         movementRepository.save(movement);
-
         return inventoryMovementMapper.toDTO(movement);
     }
 
