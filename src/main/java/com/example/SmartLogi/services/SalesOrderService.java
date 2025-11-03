@@ -5,6 +5,7 @@ import com.example.SmartLogi.dto.SalesOrderResponseDTO;
 import com.example.SmartLogi.entities.*;
 import com.example.SmartLogi.enums.OrderLineStatus;
 import com.example.SmartLogi.enums.OrderStatus;
+import com.example.SmartLogi.enums.ShipmentStatus;
 import com.example.SmartLogi.exception.ResourceNotFoundException;
 import com.example.SmartLogi.mapper.SalesOrderLineMapper;
 import com.example.SmartLogi.mappers.SalesOrderMapper;
@@ -15,6 +16,7 @@ import  com.example.SmartLogi.enums.OrderLineStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
@@ -35,6 +37,8 @@ public class SalesOrderService {
     private InventoryRepository inventoryRepository;
     @Autowired
     private SalesOrderLineRepository salesOrderLineRepository;
+    @Autowired
+    private ShipmentRepository shipmentRepository;
 
     @Autowired
     private SalesOrderMapper salesOrderMapper;
@@ -115,16 +119,43 @@ public class SalesOrderService {
             inventoryRepository.save(inventory);
         });
 
-        // تحديث status عام للطلب حسب aggregate lines
+
+
         if (order.getOrderLines().stream().allMatch(l -> l.getStatus() == OrderLineStatus.RESERVED)) {
             order.setOrderStatus(OrderStatus.RESERVED);
         } else if (order.getOrderLines().stream().anyMatch(l -> l.getQuantityReserved() > 0)) {
             order.setOrderStatus(OrderStatus.PARTIALLY_RESERVED);
         } else {
-            order.setOrderStatus(OrderStatus.CREATED); // أو REJECTED حسب القاعدة
+            order.setOrderStatus(OrderStatus.CREATED);
         }
-
         salesOrderRepository.save(order);
     }
+
+
+    public SalesOrderResponseDTO confirmOrder(Long orderId) {
+        SalesOrder order = salesOrderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+
+        if (order.getOrderStatus() != OrderStatus.RESERVED &&
+                order.getOrderStatus() != OrderStatus.PARTIALLY_RESERVED) {
+            throw new IllegalStateException("Order cannot be confirmed at this stage");
+        }
+
+        order.setOrderStatus(OrderStatus.CONFIRMED);
+        order.setConfirmedAt(LocalDateTime.now());
+        salesOrderRepository.save(order);
+
+        Shipment shipment = Shipment.builder()
+                .salesOrder(order)
+                .trackingNumber(UUID.randomUUID().toString())
+                .shipmentStatus(ShipmentStatus.PLANNED)
+                .plannedDate(LocalDateTime.now())
+                .build();
+
+        shipmentRepository.save(shipment);
+
+        return salesOrderMapper.toDTO(order);
+    }
+
 
 }

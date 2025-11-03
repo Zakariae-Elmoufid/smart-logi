@@ -38,6 +38,8 @@ public class SalesOrder {
 
     @Column(name="created_at")
     private LocalDateTime createdAt;
+    @Column(name="confirmed_at")
+    private LocalDateTime confirmedAt;
     @Column(name="reserved_at")
     private LocalDateTime reservedAt;
     @Column(name="shipped_at")

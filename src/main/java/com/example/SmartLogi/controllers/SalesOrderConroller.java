@@ -10,10 +10,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
@@ -26,6 +23,17 @@ public class SalesOrderConroller {
     @PostMapping
     public ResponseEntity<ApiResponse> createOrder(@Valid @RequestBody SalesOrderRequestDTO dto) {
         SalesOrderResponseDTO salesOrder = salesOrderService.create(dto);
+        ApiResponse response = ApiResponse.builder()
+                .message(salesOrder.message())
+                .data(salesOrder)
+                .status(HttpStatus.CREATED.value())
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/{id}/confirm")
+    public ResponseEntity<ApiResponse> getSalesOrder(@Valid @PathVariable Long id){
+        SalesOrderResponseDTO salesOrder = salesOrderService.confirmOrder(id);
         ApiResponse response = ApiResponse.builder()
                 .message(salesOrder.message())
                 .data(salesOrder)
