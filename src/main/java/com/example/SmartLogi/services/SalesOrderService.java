@@ -10,12 +10,14 @@ import com.example.SmartLogi.exception.ResourceNotFoundException;
 import com.example.SmartLogi.mapper.SalesOrderLineMapper;
 import com.example.SmartLogi.mappers.SalesOrderMapper;
 import com.example.SmartLogi.repositories.*;
+import com.example.SmartLogi.util.TrackingNumberGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import  com.example.SmartLogi.enums.OrderLineStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -144,10 +146,9 @@ public class SalesOrderService {
         order.setOrderStatus(OrderStatus.CONFIRMED);
         order.setConfirmedAt(LocalDateTime.now());
         salesOrderRepository.save(order);
-
         Shipment shipment = Shipment.builder()
                 .salesOrder(order)
-                .trackingNumber(UUID.randomUUID().toString())
+                .trackingNumber("TRK-" + order.getId())
                 .shipmentStatus(ShipmentStatus.PLANNED)
                 .plannedDate(LocalDateTime.now())
                 .build();
