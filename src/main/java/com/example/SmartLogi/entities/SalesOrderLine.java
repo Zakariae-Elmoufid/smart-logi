@@ -1,8 +1,16 @@
 package com.example.SmartLogi.entities;
 
 
+import com.example.SmartLogi.enums.OrderLineStatus;
 import jakarta.persistence.*;
+import lombok.*;
 
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@Builder
 @Entity
 @Table(name="sales_order_line")
 public class SalesOrderLine {
@@ -12,7 +20,19 @@ public class SalesOrderLine {
     @Column(name="id")
     private Long id;
 
-    private int quantity;
+    @Column(name="quantity_requested")
+    private int quantityRequested;
+
+    @Column(name="quantity_reserved")
+    private int quantityReserved;
+
+    @Column(name="quantity_backorder")
+    private int quantityBackorder;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name="status")
+    private OrderLineStatus status;
+
     private double price;
 
     @ManyToOne
@@ -23,52 +43,7 @@ public class SalesOrderLine {
     @JoinColumn(name = "sales_order_id")
     private SalesOrder salesOrder;
 
-    public SalesOrderLine() {}
-    public SalesOrderLine(Long id, int quantity, double price, Product product, SalesOrder salesOrder) {
-        this.id = id;
-        this.quantity = quantity;
-        this.price = price;
-        this.product = product;
-        this.salesOrder = salesOrder;
-    }
 
-    public Long getId() {
-        return id;
-    }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
 
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
-    public Product getProduct() {
-        return product;
-    }
-
-    public void setProduct(Product product) {
-        this.product = product;
-    }
-
-    public SalesOrder getSalesOrder() {
-        return salesOrder;
-    }
-
-    public void setSalesOrder(SalesOrder salesOrder) {
-        this.salesOrder = salesOrder;
-    }
 }

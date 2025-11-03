@@ -1,5 +1,6 @@
 package com.example.SmartLogi.exception;
 
+import com.example.SmartLogi.dto.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,6 +50,15 @@ public class GlobalExceptionHandler {
                 "path", req.getRequestURI()
         ));
 
+    }
+
+    @ExceptionHandler(InsufficientInventoryException.class)
+    public ResponseEntity<ApiResponse> handleInsufficientInventory(InsufficientInventoryException ex) {
+        ApiResponse response = ApiResponse.builder()
+                .message(ex.getMessage())
+                .status(HttpStatus.CONFLICT.value())
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, String>> handleGeneralException(Exception ex) {

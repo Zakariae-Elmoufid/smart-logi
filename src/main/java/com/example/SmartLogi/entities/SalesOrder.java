@@ -3,11 +3,18 @@ package com.example.SmartLogi.entities;
 
 import com.example.SmartLogi.enums.OrderStatus;
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name ="sales_order")
 public class SalesOrder {
@@ -19,9 +26,14 @@ public class SalesOrder {
     @JoinColumn(name = "client_id")
     private Client client;
 
+    @ManyToOne
+    @JoinColumn(name = "warehouse_id")
+    private Warehouse warehouse;
+
     @Enumerated(EnumType.STRING)
     @Column(name="order_status")
     private OrderStatus orderStatus;
+
 
 
     @Column(name="created_at")
@@ -37,79 +49,5 @@ public class SalesOrder {
     private List<SalesOrderLine> orderLines = new ArrayList<>();
 
 
-    public SalesOrder() {}
-    public SalesOrder(long id, List<SalesOrderLine> orderLines, LocalDateTime deliveredAt, LocalDateTime shippedAt, LocalDateTime reservedAt, LocalDateTime createdAt, OrderStatus orderStatus, Client client) {
-        this.id = id;
-        this.orderLines = orderLines;
-        this.deliveredAt = deliveredAt;
-        this.shippedAt = shippedAt;
-        this.reservedAt = reservedAt;
-        this.createdAt = createdAt;
-        this.orderStatus = orderStatus;
-        this.client = client;
-    }
 
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public Client getClient() {
-        return client;
-    }
-
-    public void setClient(Client client) {
-        this.client = client;
-    }
-
-    public OrderStatus getOrderStatus() {
-        return orderStatus;
-    }
-
-    public void setOrderStatus(OrderStatus orderStatus) {
-        this.orderStatus = orderStatus;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getReservedAt() {
-        return reservedAt;
-    }
-
-    public void setReservedAt(LocalDateTime reservedAt) {
-        this.reservedAt = reservedAt;
-    }
-
-    public LocalDateTime getShippedAt() {
-        return shippedAt;
-    }
-
-    public void setShippedAt(LocalDateTime shippedAt) {
-        this.shippedAt = shippedAt;
-    }
-
-    public LocalDateTime getDeliveredAt() {
-        return deliveredAt;
-    }
-
-    public void setDeliveredAt(LocalDateTime deliveredAt) {
-        this.deliveredAt = deliveredAt;
-    }
-
-    public List<SalesOrderLine> getOrderLines() {
-        return orderLines;
-    }
-
-    public void setOrderLines(List<SalesOrderLine> orderLines) {
-        this.orderLines = orderLines;
-    }
 }
