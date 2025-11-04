@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
-public interface ShipmentRepository  extends CrudRepository<Shipment, Integer> {
+public interface ShipmentRepository  extends CrudRepository<Shipment, Long> {
 
     @Modifying
     @Query("UPDATE Shipment s SET s.shipmentStatus = 'CANCELLED' WHERE s.salesOrder.id = :orderId")

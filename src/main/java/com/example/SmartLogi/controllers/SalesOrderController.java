@@ -3,8 +3,6 @@ package com.example.SmartLogi.controllers;
 import com.example.SmartLogi.dto.ApiResponse;
 import com.example.SmartLogi.dto.SalesOrderRequestDTO;
 import com.example.SmartLogi.dto.SalesOrderResponseDTO;
-import com.example.SmartLogi.entities.SalesOrder;
-import com.example.SmartLogi.repositories.SalesOrderRepository;
 import com.example.SmartLogi.services.SalesOrderService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/client/salse-order")
-public class SalesOrderConroller {
+public class SalesOrderController {
 
     @Autowired
     private SalesOrderService salesOrderService;

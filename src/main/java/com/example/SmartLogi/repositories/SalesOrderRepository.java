@@ -8,5 +8,5 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface SalesOrderRepository  extends JpaRepository<SalesOrder,Long> {
-    public List<SalesOrder> findByStatusAndReservedAtBefore(OrderStatus status, LocalDateTime threshold);
+    public List<SalesOrder> findByOrderStatusAndReservedAtBefore(OrderStatus status, LocalDateTime threshold);
 }

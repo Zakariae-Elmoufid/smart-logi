@@ -26,7 +26,7 @@ public class ReservationScheduler {
     public void releaseExpiredReservations() {
         LocalDateTime threshold = LocalDateTime.now().minusHours(24);
         List<SalesOrder> expired = salesOrderRepository
-                .findByStatusAndReservedAtBefore(OrderStatus.RESERVED, threshold);
+                .findByOrderStatusAndReservedAtBefore(OrderStatus.RESERVED, threshold);
 
         expired.forEach(order -> {
             inventoryService.releaseInventory(order);
