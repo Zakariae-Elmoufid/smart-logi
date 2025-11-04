@@ -148,7 +148,11 @@ public class InventoryService {
             Inventory inventory = inventoryRepository
                     .findByProductIdAndWarehouseId(line.getProduct().getId(), order.getWarehouse().getId())
                     .orElseThrow(() -> new ResourceNotFoundException("Inventory not found for product " + line.getProduct().getName()));
-            inventory.setQuantityReserved(Math.max(0, inventory.getQuantityReserved() - line.getQuantityReserved()));
+
+            inventory.setQuantityReserved(
+                    Math.max(0, inventory.getQuantityReserved() -
+                            (line.getQuantityReserved() != null ? line.getQuantityReserved() : 0))
+            );
 
             inventoryRepository.save(inventory);
         });

@@ -24,6 +24,4 @@ public class PurchaseOrderLine {
     private PurchaseOrder purchaseOrder;
 
 
-    public  PurchaseOrderLine() {}
-
 }

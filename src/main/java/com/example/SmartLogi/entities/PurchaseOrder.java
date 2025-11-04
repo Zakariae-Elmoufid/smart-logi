@@ -2,9 +2,11 @@ package com.example.SmartLogi.entities;
 
 
 import com.example.SmartLogi.enums.OrderStatus;
+import com.example.SmartLogi.enums.PurchaseOrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,10 +26,12 @@ public class PurchaseOrder {
 
     @Column(name="order_status")
     @Enumerated(EnumType.STRING)
-    private OrderStatus orderStatus;
+    private PurchaseOrderStatus orderStatus;
     @Column(name="order_date")
     private LocalDateTime orderDate;
 
+    @Column(name="expected_date")
+    private LocalDate expectedDate;
 
     @ManyToOne
     @JoinColumn(name="supplier_id")
