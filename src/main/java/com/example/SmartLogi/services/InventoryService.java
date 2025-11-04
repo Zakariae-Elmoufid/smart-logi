@@ -4,10 +4,7 @@ import com.example.SmartLogi.dto.InventoryMovementRequestDTO;
 import com.example.SmartLogi.dto.InventoryMovementResponseDTO;
 import com.example.SmartLogi.dto.InventoryRequestDTO;
 import com.example.SmartLogi.dto.InventoryResponseDTO;
-import com.example.SmartLogi.entities.Inventory;
-import com.example.SmartLogi.entities.InventoryMovement;
-import com.example.SmartLogi.entities.Product;
-import com.example.SmartLogi.entities.Warehouse;
+import com.example.SmartLogi.entities.*;
 import com.example.SmartLogi.enums.MovementType;
 import com.example.SmartLogi.exception.BusinessException;
 import com.example.SmartLogi.exception.ResourceNotFoundException;
@@ -143,6 +140,18 @@ public class InventoryService {
                 .build();
         movementRepository.save(movement);
         return inventoryMovementMapper.toDTO(movement);
+    }
+
+
+    public void  releaseInventory(SalesOrder order){
+        order.getOrderLines().forEach(line -> {
+            Inventory inventory = inventoryRepository
+                    .findByProductIdAndWarehouseId(line.getProduct().getId(), order.getWarehouse().getId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Inventory not found for product " + line.getProduct().getName()));
+            inventory.setQuantityReserved(Math.max(0, inventory.getQuantityReserved() - line.getQuantityReserved()));
+
+            inventoryRepository.save(inventory);
+        });
     }
 
 }
