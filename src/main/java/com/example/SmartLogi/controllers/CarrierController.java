@@ -64,6 +64,7 @@ public class CarrierController {
         return ResponseEntity.ok(response);
     }
 
+
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse> deleteCarrier(@PathVariable Long id) {
         carrierService.delete(id);
