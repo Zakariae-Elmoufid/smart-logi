@@ -21,13 +21,13 @@ public class SalesOrderLine {
     private Long id;
 
     @Column(name="quantity_requested")
-    private int quantityRequested;
+    private Integer  quantityRequested;
 
     @Column(name="quantity_reserved")
-    private int quantityReserved;
+    private Integer  quantityReserved;
 
     @Column(name="quantity_backorder")
-    private int quantityBackorder;
+    private Integer  quantityBackorder;
 
     @Enumerated(EnumType.STRING)
     @Column(name="status")

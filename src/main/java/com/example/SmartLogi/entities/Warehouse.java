@@ -39,6 +39,9 @@ public class Warehouse {
     @OneToMany(mappedBy = "warehouse", cascade = CascadeType.ALL)
     private List<Inventory> inventories;
 
+    @OneToMany(mappedBy = "warehouse" )
+    private List<PurchaseOrder> purchaseOrders;
+
 
 
 

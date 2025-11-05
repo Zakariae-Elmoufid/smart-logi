@@ -16,8 +16,6 @@ import com.example.SmartLogi.repositories.ProductRepository;
 import com.example.SmartLogi.repositories.WarehouseRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -148,7 +146,11 @@ public class InventoryService {
             Inventory inventory = inventoryRepository
                     .findByProductIdAndWarehouseId(line.getProduct().getId(), order.getWarehouse().getId())
                     .orElseThrow(() -> new ResourceNotFoundException("Inventory not found for product " + line.getProduct().getName()));
-            inventory.setQuantityReserved(Math.max(0, inventory.getQuantityReserved() - line.getQuantityReserved()));
+
+            inventory.setQuantityReserved(
+                    Math.max(0, inventory.getQuantityReserved() -
+                            (line.getQuantityReserved() != null ? line.getQuantityReserved() : 0))
+            );
 
             inventoryRepository.save(inventory);
         });

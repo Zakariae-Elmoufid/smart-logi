@@ -5,7 +5,6 @@ import com.example.SmartLogi.dto.CategoryResponseDTO;
 import com.example.SmartLogi.entities.Category;
 import com.example.SmartLogi.mapper.CategoryMapper;
 import com.example.SmartLogi.repositories.CategoryRepository;
-import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

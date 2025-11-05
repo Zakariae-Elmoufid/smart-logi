@@ -8,18 +8,13 @@ import com.example.SmartLogi.enums.OrderStatus;
 import com.example.SmartLogi.enums.ShipmentStatus;
 import com.example.SmartLogi.exception.ResourceNotFoundException;
 import com.example.SmartLogi.mapper.SalesOrderLineMapper;
-import com.example.SmartLogi.mappers.SalesOrderMapper;
+import com.example.SmartLogi.mapper.SalesOrderMapper;
 import com.example.SmartLogi.repositories.*;
-import com.example.SmartLogi.util.TrackingNumberGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import  com.example.SmartLogi.enums.OrderLineStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Random;
-import java.util.UUID;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
 public class SalesOrderService {

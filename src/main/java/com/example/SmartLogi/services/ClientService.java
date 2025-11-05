@@ -8,8 +8,6 @@ import com.example.SmartLogi.mapper.ClientMapper;
 import com.example.SmartLogi.repositories.ClientRepository;
 import com.example.SmartLogi.util.PasswordUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;

@@ -7,6 +7,6 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface CarrierMapper {
-     Carrier toEntity(CarrierRequestDTO dto);
-    CarrierResponseDTO toDTO(Carrier carrier);
+        Carrier toEntity(CarrierRequestDTO dto);
+        CarrierResponseDTO toDTO(Carrier carrier);
 }

@@ -47,7 +47,7 @@ public class SalesOrder {
     @Column(name="delivered_at")
     private LocalDateTime deliveredAt;
 
-    @OneToMany(mappedBy = "salesOrder", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "salesOrder", fetch = FetchType.EAGER)
     private List<SalesOrderLine> orderLines = new ArrayList<>();
 
 
