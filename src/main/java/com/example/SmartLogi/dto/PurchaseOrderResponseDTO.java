@@ -1,5 +1,6 @@
 package com.example.SmartLogi.dto;
 
+import com.example.SmartLogi.enums.PurchaseOrderStatus;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
@@ -10,9 +11,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public record PurchaseOrderResponseDTO (
+        long id,
         long supplierId,
         long warehouseId,
+        String orderStatus,
         LocalDateTime expectedDate,
-        List< PurchaseOrderLineRsponseDTO> purchaseOrderLineResponsetDTO
+        LocalDateTime orderDate,
+        List<PurchaseOrderLineRsponseDTO> lines
 ){
 }

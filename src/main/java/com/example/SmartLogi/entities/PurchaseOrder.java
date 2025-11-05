@@ -27,11 +27,12 @@ public class PurchaseOrder {
     @Column(name="order_status")
     @Enumerated(EnumType.STRING)
     private PurchaseOrderStatus orderStatus;
+
     @Column(name="order_date")
     private LocalDateTime orderDate;
 
     @Column(name="expected_date")
-    private LocalDate expectedDate;
+    private LocalDateTime expectedDate;
 
     @ManyToOne
     @JoinColumn(name="supplier_id")

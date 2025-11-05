@@ -9,9 +9,6 @@ public record PurchaseOrderLineRequestDTO(
         @Positive(message = "Quantity must be greater than 0")
         int quantity,
 
-        @Positive(message = "Unit price must be greater than 0")
-        double unitPrice,
-
         @Positive(message = "Product ID must be positive")
         long productId
 ) {

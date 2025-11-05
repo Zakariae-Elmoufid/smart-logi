@@ -3,7 +3,6 @@ package com.example.SmartLogi.services;
 
 import com.example.SmartLogi.dto.WarehouseRequestDTO;
 import com.example.SmartLogi.dto.WarehouseResponseDTO;
-import com.example.SmartLogi.entities.Product;
 import com.example.SmartLogi.entities.Warehouse;
 import com.example.SmartLogi.mapper.WarehouseMapper;
 import com.example.SmartLogi.repositories.WarehouseRepository;
@@ -11,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service

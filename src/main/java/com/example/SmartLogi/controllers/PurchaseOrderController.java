@@ -1,11 +1,11 @@
 package com.example.SmartLogi.controllers;
 
 
-import com.example.SmartLogi.dto.ApiResponse;
-import com.example.SmartLogi.dto.PurchaseOrderRequestDTO;
-import com.example.SmartLogi.dto.PurchaseOrderResponseDTO;
+import com.example.SmartLogi.dto.*;
+import com.example.SmartLogi.entities.PurchaseOrder;
 import com.example.SmartLogi.repositories.PurchaseOrderRepository;
 import com.example.SmartLogi.services.PurchaseOrderService;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -54,6 +54,34 @@ public class PurchaseOrderController {
                 .build();
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
+
+    @GetMapping("/{id}/approve")
+    public ResponseEntity<ApiResponse> approvePurchaseOrder(@PathVariable Long id) {
+        PurchaseOrderResponseDTO oder = purchaseOrderService.approvePurchaseOrder(id);
+        ApiResponse response = ApiResponse.builder()
+                .message("Purchase Order canceled successfully!")
+                .status(HttpStatus.OK.value())
+                .data(oder)
+                .build();
+        return ResponseEntity.ok(response);
+    }
+
+        @PostMapping("/{poId}/receive")
+    public ResponseEntity<ApiResponse> receivePurchaseOrder(@PathVariable Long poId , @Valid @RequestBody ReceivePurchaseOrderRequestDTO dto) {
+         InventoryMovementResponseDTO inventoryMovement = purchaseOrderService.receiveProduct(poId,dto) ;
+         ApiResponse response = ApiResponse.builder()
+                 .message("Product received successfully")
+                 .status(HttpStatus.OK.value())
+                 .data(inventoryMovement)
+                 .build();
+         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+
+
+
+
+
 
 //    @PutMapping("/{id}")
 //    public  ResponseEntity<ApiResponse> updatePurchaseOrder(@PathVariable Long id,

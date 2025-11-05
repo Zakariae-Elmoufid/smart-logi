@@ -12,7 +12,6 @@ import com.example.SmartLogi.repositories.WarehouseRepository;
 import com.example.SmartLogi.util.PasswordUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;

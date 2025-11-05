@@ -16,8 +16,6 @@ import com.example.SmartLogi.repositories.ProductRepository;
 import com.example.SmartLogi.repositories.WarehouseRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;

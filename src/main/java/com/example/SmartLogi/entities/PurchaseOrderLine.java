@@ -2,7 +2,13 @@ package com.example.SmartLogi.entities;
 
 
 import jakarta.persistence.*;
+import lombok.*;
 
+@Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name="purchase_order_line")
 public class PurchaseOrderLine {
@@ -22,6 +28,7 @@ public class PurchaseOrderLine {
     @ManyToOne
     @JoinColumn(name = "purchase_order_id")
     private PurchaseOrder purchaseOrder;
+
 
 
 }
