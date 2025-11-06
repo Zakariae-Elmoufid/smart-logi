@@ -21,7 +21,7 @@ public class Inventory {
     @Column(name="quantity_on_hand")
     private  int quantityOnHand;
     @Column(name="quantity_reserved")
-    private int quantityReserved;
+    private Integer quantityReserved;
 
 
     @ManyToOne
