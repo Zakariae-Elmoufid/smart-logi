@@ -2,6 +2,9 @@ package com.example.SmartLogi.entities;
 
 
 import com.example.SmartLogi.enums.OrderStatus;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,10 +28,12 @@ public class SalesOrder {
 
     @ManyToOne
     @JoinColumn(name = "client_id")
+    @JsonIgnore
     private Client client;
 
     @ManyToOne
     @JoinColumn(name = "warehouse_id")
+    @JsonIgnore
     private Warehouse warehouse;
 
     @Enumerated(EnumType.STRING)
@@ -48,8 +53,12 @@ public class SalesOrder {
     @Column(name="delivered_at")
     private LocalDateTime deliveredAt;
 
-    @OneToMany(mappedBy = "salesOrder", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    private List<SalesOrderLine> orderLines = new ArrayList<>();
+
+
+    @OneToMany(mappedBy = "salesOrder", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<SalesOrderLine> orderLines;
+
 
 
 
