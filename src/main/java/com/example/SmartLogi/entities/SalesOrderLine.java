@@ -2,6 +2,8 @@ package com.example.SmartLogi.entities;
 
 
 import com.example.SmartLogi.enums.OrderLineStatus;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -38,12 +40,14 @@ public class SalesOrderLine {
 
     @ManyToOne
     @JoinColumn(name = "product_id")
+    @JsonIgnore
     private Product product;
+
 
     @ManyToOne
     @JoinColumn(name = "sales_order_id")
+    @JsonIgnore
     private SalesOrder salesOrder;
-
 
 
 
