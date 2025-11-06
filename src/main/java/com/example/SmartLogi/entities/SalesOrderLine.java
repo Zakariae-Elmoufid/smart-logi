@@ -11,6 +11,7 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
+@ToString
 @Entity
 @Table(name="sales_order_line")
 public class SalesOrderLine {

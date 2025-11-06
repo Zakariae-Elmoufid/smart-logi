@@ -16,6 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Entity
+@ToString
 @Table(name ="sales_order")
 public class SalesOrder {
     @Id
@@ -47,7 +48,7 @@ public class SalesOrder {
     @Column(name="delivered_at")
     private LocalDateTime deliveredAt;
 
-    @OneToMany(mappedBy = "salesOrder", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "salesOrder", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<SalesOrderLine> orderLines = new ArrayList<>();
 
 

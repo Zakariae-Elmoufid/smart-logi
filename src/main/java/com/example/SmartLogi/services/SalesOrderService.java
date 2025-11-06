@@ -6,15 +6,19 @@ import com.example.SmartLogi.entities.*;
 import com.example.SmartLogi.enums.OrderLineStatus;
 import com.example.SmartLogi.enums.OrderStatus;
 import com.example.SmartLogi.enums.ShipmentStatus;
+import com.example.SmartLogi.exception.BusinessException;
 import com.example.SmartLogi.exception.ResourceNotFoundException;
 import com.example.SmartLogi.mapper.SalesOrderLineMapper;
 import com.example.SmartLogi.mapper.SalesOrderMapper;
 import com.example.SmartLogi.repositories.*;
+import jakarta.transaction.Transactional;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class SalesOrderService {
@@ -43,49 +47,58 @@ public class SalesOrderService {
     private SalesOrderLineMapper  salesOrderLineMapper;
 
 
+    @Transactional
     public SalesOrderResponseDTO create(SalesOrderRequestDTO dto) {
         Client client = clientRepository.findById(dto.clientId())
                 .orElseThrow(() -> new ResourceNotFoundException("Client not found"));
+
         Warehouse warehouse = warehouseRepository.findById(dto.warehouseId())
                 .orElseThrow(() -> new ResourceNotFoundException("Warehouse not found"));
-
-        SalesOrder  order = SalesOrder.builder()
+        SalesOrder order = SalesOrder.builder()
                 .client(client)
                 .warehouse(warehouse)
                 .orderStatus(OrderStatus.CREATED)
                 .createdAt(LocalDateTime.now())
                 .build();
-//        salesOrderRepository.save(order);
 
-        List<SalesOrderLine> lines = dto.lines().stream().map(lineDto -> {
-            Product product = productRepository.findById(lineDto.productId())
-                    .filter(Product::getActive)
-                    .orElseThrow(() -> new ResourceNotFoundException("Product not found or inactive, id: " + lineDto.productId()));
-            return  SalesOrderLine.builder().product(product)
-                    .price(product.getSellingPrice())
-                    .quantityRequested(lineDto.quantityRequested())
-                    .salesOrder(order)
-                    .build();
-        }).toList();
+        SalesOrder tempOrder = order;
 
+        List<SalesOrderLine> orderLines = dto.lines().stream()
+                .map(lineDto -> {
+                    Product product = productRepository.findById(lineDto.productId())
+                            .filter(Product::getActive)
+                            .orElseThrow(() -> new ResourceNotFoundException(
+                                    "Product not found or inactive, id: " + lineDto.productId()));
 
+                    return SalesOrderLine.builder()
+                            .product(product)
+                            .price(product.getSellingPrice())
+                            .quantityRequested(lineDto.quantityRequested())
+                            .salesOrder(tempOrder)
+                            .build();
+                })
+                .toList();
 
-        order.setOrderLines(lines);
-        reserveLines(order);
+        order.setOrderLines(orderLines);
+
+          reserveLines(order);
+
+        order = salesOrderRepository.save(order);
 
         String message = order.getOrderLines().stream()
-                .map(line -> line.getProduct().getName() + ": " +
-                        line.getQuantityReserved() + "/" + line.getQuantityRequested() +
-                        " reserved, " + line.getQuantityBackorder() + " backorder")
-                .reduce((l1,l2) -> l1 + "; " + l2)
-                .orElse("");
+                .map(line -> String.format("%s: %d/%d reserved, %d backorder",
+                        line.getProduct().getName(),
+                        line.getQuantityReserved(),
+                        line.getQuantityRequested(),
+                        line.getQuantityBackorder()))
+                .collect(Collectors.joining("; "));
 
-        SalesOrderResponseDTO response = salesOrderMapper.toDTO(order);
+        SalesOrderResponseDTO mappedOrder = salesOrderMapper.toDTO(order);
         return new SalesOrderResponseDTO(
-                response.id(),
-                response.clientId(),
-                response.orderStatus(),
-                response.orderLines(),
+                mappedOrder.id(),
+                mappedOrder.clientId(),
+                mappedOrder.orderStatus(),
+                mappedOrder.orderLines(),
                 message
         );
     }
@@ -114,6 +127,7 @@ public class SalesOrderService {
             }
 
             inventoryRepository.save(inventory);
+
         });
 
 
@@ -125,7 +139,8 @@ public class SalesOrderService {
         } else {
             order.setOrderStatus(OrderStatus.CREATED);
         }
-        salesOrderRepository.save(order);
+
+
     }
 
 
@@ -151,6 +166,43 @@ public class SalesOrderService {
         shipmentRepository.save(shipment);
 
         return salesOrderMapper.toDTO(order);
+    }
+
+
+    public SalesOrderResponseDTO cancel(long id)  {
+         SalesOrder order = salesOrderRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+
+        if (order.getOrderStatus() == OrderStatus.SHIPPED) {
+            throw new BusinessException("Cannot cancel a shipped order. Use return process instead.");
+        }
+
+         if(order.getOrderStatus() == OrderStatus.CREATED) {
+             order.setOrderStatus(OrderStatus.CANCELLED);
+
+         }
+        else if (order.getOrderStatus() == OrderStatus.PARTIALLY_RESERVED
+                || order.getOrderStatus() == OrderStatus.RESERVED) {
+
+             order.getOrderLines().forEach(line -> {
+                System.out.println("Updating inventory for product: " + line.getProduct().getId());
+
+                Inventory inventory = inventoryRepository.findByProductIdAndWarehouseId(
+                                line.getProduct().getId(), order.getWarehouse().getId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Inventory not found"));
+
+
+                int reservedQty = line.getQuantityReserved() != null ? line.getQuantityReserved() : 0;
+                int currentReserved = inventory.getQuantityReserved() != null ? inventory.getQuantityReserved() : 0;
+
+
+                inventory.setQuantityReserved(Math.max(0, currentReserved - reservedQty));
+                inventoryRepository.save(inventory);
+            });
+
+            order.setOrderStatus(OrderStatus.CANCELLED);
+        }
+         return salesOrderMapper.toDTO(salesOrderRepository.save(order));
     }
 
 

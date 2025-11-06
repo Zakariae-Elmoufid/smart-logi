@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/api/client/salse-order")
+@RequestMapping("/api/sales-order")
 public class SalesOrderController {
 
     @Autowired
@@ -38,6 +38,17 @@ public class SalesOrderController {
                 .status(HttpStatus.CREATED.value())
                 .build();
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/{id}/cancel")
+    public ResponseEntity<ApiResponse> canceledSalesOrder(@PathVariable Long id){
+        SalesOrderResponseDTO salesOrder  = salesOrderService.cancel(id);
+        ApiResponse response = ApiResponse.builder()
+                .message("Order has been canceled")
+                .data(salesOrder)
+                .status(HttpStatus.OK.value())
+                .build();
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
