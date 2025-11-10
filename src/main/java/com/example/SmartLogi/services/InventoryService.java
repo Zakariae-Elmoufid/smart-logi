@@ -6,6 +6,7 @@ import com.example.SmartLogi.dto.InventoryRequestDTO;
 import com.example.SmartLogi.dto.InventoryResponseDTO;
 import com.example.SmartLogi.entities.*;
 import com.example.SmartLogi.enums.MovementType;
+import com.example.SmartLogi.enums.OrderLineStatus;
 import com.example.SmartLogi.exception.BusinessException;
 import com.example.SmartLogi.exception.ResourceNotFoundException;
 import com.example.SmartLogi.mapper.InventoryMapper;
@@ -98,7 +99,7 @@ public class InventoryService {
        }
 
        if(inventory.getQuantityOnHand() < dto.quantity()){
-          throw  new BusinessException("quantity is greater than inventory quantity");
+          throw  new BusinessException("Stock cannot be negative");
        }
 
        inventory.setQuantityOnHand(inventory.getQuantityOnHand() - dto.quantity());
@@ -138,6 +139,35 @@ public class InventoryService {
                 .build();
         movementRepository.save(movement);
         return inventoryMovementMapper.toDTO(movement);
+    }
+
+
+
+    public void  reservedQuantity(SalesOrderLine line ,long  warehouseId) {
+        Inventory inventory = inventoryRepository
+                .findByProductIdAndWarehouseId(line.getProduct().getId(), warehouseId)
+                .orElseThrow(() -> new ResourceNotFoundException("Inventory not found for product " + line.getProduct().getName()));
+
+        int available = inventory.getQuantityOnHand() - inventory.getQuantityReserved();
+
+        int reserved = Math.min(line.getQuantityRequested(), available);
+
+
+        inventory.setQuantityReserved(inventory.getQuantityReserved() + reserved);
+        line.setQuantityReserved(reserved);
+        line.setQuantityBackorder(line.getQuantityRequested() - reserved);
+
+        if (reserved == line.getQuantityRequested()) {
+            line.setStatus(OrderLineStatus.RESERVED);
+
+        } else if (reserved > 0) {
+            line.setStatus(OrderLineStatus.PARTIALLY_RESERVED);
+        } else {
+            line.setStatus(OrderLineStatus.NOT_RESERVED);
+        }
+
+        inventoryRepository.save(inventory);
+
     }
 
 
