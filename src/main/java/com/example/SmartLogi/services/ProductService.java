@@ -1,12 +1,21 @@
 package com.example.SmartLogi.services;
 
+import com.example.SmartLogi.dto.DeactivateProductDTO;
 import com.example.SmartLogi.dto.ProductRequestDTO;
 import com.example.SmartLogi.dto.ProductResponseDTO;
 import com.example.SmartLogi.entities.Category;
+import com.example.SmartLogi.entities.Inventory;
 import com.example.SmartLogi.entities.Product;
+import com.example.SmartLogi.entities.SalesOrderLine;
+import com.example.SmartLogi.enums.OrderLineStatus;
+import com.example.SmartLogi.exception.BusinessException;
+import com.example.SmartLogi.exception.ResourceNotFoundException;
 import com.example.SmartLogi.mapper.ProductMapper;
 import com.example.SmartLogi.repositories.CategoryRepository;
+import com.example.SmartLogi.repositories.InventoryRepository;
 import com.example.SmartLogi.repositories.ProductRepository;
+import com.example.SmartLogi.repositories.SalesOrderLineRepository;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +32,12 @@ public class ProductService {
 
      @Autowired
      private CategoryRepository categoryRepository;
+
+     @Autowired
+     private SalesOrderLineRepository salesOrderLineRepository;
+
+     @Autowired
+     private InventoryRepository inventoryRepository;
 
      @Autowired
     private   ProductMapper mapper;
@@ -77,6 +92,34 @@ public class ProductService {
             repository.deleteById(id);
             return true;
 
+    }
+
+
+    public  ProductResponseDTO deactivate(DeactivateProductDTO dto) {
+
+        Product product = repository.findBySkuAndActive(dto.getSku(), true).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+
+        List<SalesOrderLine> lines = salesOrderLineRepository.findAllByProductSku(product.getSku());
+
+        lines.forEach(line -> {
+            if(line.getProduct().getId().equals(product.getId()) && line.getStatus().equals(OrderLineStatus.RESERVED)
+                    ||line.getStatus().equals(OrderLineStatus.PARTIALLY_RESERVED)
+                    ||line.getStatus().equals(OrderLineStatus.CREATED)
+            ) {
+                throw new BusinessException("Product is already reserved ");
+            }
+        });
+
+        List<Inventory> inventories = inventoryRepository.findByProductSku(dto.getSku());
+
+        inventories.forEach(inventory -> {
+            if(inventory.getQuantityReserved() > 0 || inventory.getQuantityOnHand() >0){
+                throw new BusinessException("Product is still in inventory ");
+            }
+        });
+
+        product.setActive(false);
+        return mapper.toDTO(repository.save(product));
     }
 
 

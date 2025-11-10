@@ -4,6 +4,7 @@ package com.example.SmartLogi.controllers;
 import com.example.SmartLogi.dto.ApiResponse;
 import com.example.SmartLogi.dto.ProductRequestDTO;
 import com.example.SmartLogi.dto.ProductResponseDTO;
+import com.example.SmartLogi.dto.DeactivateProductDTO;
 import com.example.SmartLogi.services.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,17 +88,31 @@ public class ProductController {
     }
 
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse> deleteProduct(@PathVariable Long id) {
-        boolean deleted = productService.deleteProduct(id);
+    @PatchMapping("/{sku}")
+    public ResponseEntity<ApiResponse> deactivateProduct(@PathVariable String sku) {
+        DeactivateProductDTO dto =  new DeactivateProductDTO(sku);
+
+        ProductResponseDTO product = productService.deactivate(dto);
 
         ApiResponse response = ApiResponse.builder()
-                .message(deleted ? "Product deleted successfully" : "Product not found")
-                .status(deleted ? HttpStatus.OK.value() : HttpStatus.NOT_FOUND.value())
+                .message("Product deactivated")
+                .status(HttpStatus.OK.value())
+                .data(product)
                 .build();
-
-        return new ResponseEntity<>(response, deleted ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+        return ResponseEntity.ok(response);
     }
+
+//    @DeleteMapping("/{id}")
+//    public ResponseEntity<ApiResponse> deleteProduct(@PathVariable Long id) {
+//        boolean deleted = productService.deleteProduct(id);
+//
+//        ApiResponse response = ApiResponse.builder()
+//                .message(deleted ? "Product deleted successfully" : "Product not found")
+//                .status(deleted ? HttpStatus.OK.value() : HttpStatus.NOT_FOUND.value())
+//                .build();
+//
+//        return new ResponseEntity<>(response, deleted ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+//    }
 
 
 
