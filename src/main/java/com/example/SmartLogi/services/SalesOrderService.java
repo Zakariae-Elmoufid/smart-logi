@@ -48,6 +48,9 @@ public class SalesOrderService {
 
     @Autowired
     private  InventoryMovementRepository inventoryMovementRepository;
+    @Autowired
+    private InventoryService inventoryService;
+    private SalesOrderService salesOrderService;
 
     @Autowired
     private SalesOrderMapper salesOrderMapper;
@@ -122,26 +125,32 @@ public class SalesOrderService {
                 continue;
             }
 
-            Inventory inventory = inventoryRepository
-                    .findByProductIdAndWarehouseId(line.getProduct().getId(), warehouseId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Inventory not found for product " + line.getProduct().getName()));
 
-            int available = inventory.getQuantityOnHand() - inventory.getQuantityReserved();
-            int reserved = Math.min(line.getQuantityRequested(), available);
+              inventoryService.reservedQuantity(line, warehouseId);
+//            Inventory inventory = inventoryRepository
+//                    .findByProductIdAndWarehouseId(line.getProduct().getId(), warehouseId)
+//                    .orElseThrow(() -> new ResourceNotFoundException("Inventory not found for product " + line.getProduct().getName()));
+//
+//            int available = inventory.getQuantityOnHand() - inventory.getQuantityReserved();
+//
+//
+//            int reserved = Math.min(line.getQuantityRequested(), available);
+//
+//
+//            inventory.setQuantityReserved(inventory.getQuantityReserved() + reserved);
+//            line.setQuantityReserved(reserved);
+//            line.setQuantityBackorder(line.getQuantityRequested() - reserved);
+//
+//            if (reserved == line.getQuantityRequested()) {
+//                line.setStatus(OrderLineStatus.RESERVED);
+//            } else if (reserved > 0) {
+//                line.setStatus(OrderLineStatus.PARTIALLY_RESERVED);
+//            } else {
+//                line.setStatus(OrderLineStatus.NOT_RESERVED);
+//            }
+//
+//            inventoryRepository.save(inventory);
 
-            inventory.setQuantityReserved(inventory.getQuantityReserved() + reserved);
-            line.setQuantityReserved(reserved);
-            line.setQuantityBackorder(line.getQuantityRequested() - reserved);
-
-            if (reserved == line.getQuantityRequested()) {
-                line.setStatus(OrderLineStatus.RESERVED);
-            } else if (reserved > 0) {
-                line.setStatus(OrderLineStatus.PARTIALLY_RESERVED);
-            } else {
-                line.setStatus(OrderLineStatus.NOT_RESERVED);
-            }
-
-            inventoryRepository.save(inventory);
 
             // Set warehouse only if not set yet
             if (order.getWarehouse() == null) {
@@ -164,14 +173,8 @@ public class SalesOrderService {
 
     @Transactional
     public long consolidateQuantityInOneWarehouse(int quantityRequested, long productId) {
-        System.out.println("quantityRequested : "+ quantityRequested);
         List<WarehouseInventoryProjection> warehouses = warehouseRepository.findWarehousesByProductId(productId);
-         for (WarehouseInventoryProjection warehouse : warehouses) {
-             System.out.println("id: "+ warehouse.warehouseId());
-             System.out.println("aquntity: "+ warehouse.quantityHand());
 
-             System.out.println("------------------");
-         }
         int totalAvailable = warehouses.stream()
                 .mapToInt(WarehouseInventoryProjection::quantityHand)
                 .sum();
@@ -220,7 +223,7 @@ public class SalesOrderService {
                         .inventory(inventory)
                         .movementType(MovementType.OUTBOUND)
                         .createdAt(LocalDateTime.now())
-                        .description("tansfer product form this warehouse to "+ w.warehouseId() +" for consolidate Quantity In this warehouse "+mainWarehouse.warehouseId())
+                        .description("transfer product form this warehouse to "+ w.warehouseId() +" for consolidate Quantity In this warehouse "+mainWarehouse.warehouseId())
                         .build();
 
                 inventoryRepository.save(inventory);

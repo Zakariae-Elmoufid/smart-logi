@@ -8,13 +8,28 @@ import com.example.SmartLogi.entities.User;
 import com.example.SmartLogi.mapper.UserMapper;
 import com.example.SmartLogi.repositories.UserRepository;
 import com.example.SmartLogi.util.PasswordUtils;
+import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @Service
-public class UserService {
+public class UserService implements ApplicationContextAware  , BeanNameAware {
+
+    @Override
+    public void setBeanName(String name) {
+        System.out.println("➡️ اسمي فـ Spring هو: " + name);
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext context) {
+        System.out.println("📦 عندي access للـ ApplicationContext فيه كل الـ beans.");
+        System.out.println(context);
+    }
 
     @Autowired
     private UserRepository userRepository;
