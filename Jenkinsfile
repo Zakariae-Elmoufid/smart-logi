@@ -6,7 +6,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git  branch: 'dev',  url: 'https://github.com/Zakariae-Elmoufid/smart-logi.git'
+                git  branch: 'devlop',  url: 'https://github.com/Zakariae-Elmoufid/smart-logi.git'
             }
         }
         stage('Build & Test') {
