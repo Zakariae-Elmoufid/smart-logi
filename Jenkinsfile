@@ -34,7 +34,7 @@ pipeline {
         }
         stage('SonarQube Analysis') {
             steps {
-                sh './mvnw sonar:sonar'
+                 sh './mvnw clean verify sonar:sonar -Dsonar.host.url=http://sonarqube:9000 -Dsonar.login=squ_777c50385ab9534510448662c71df8336c46d84c'
             }
         }
         stage('Build Docker Image') {
