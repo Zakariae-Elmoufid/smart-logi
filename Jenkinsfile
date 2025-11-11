@@ -34,7 +34,7 @@ pipeline {
         }
         stage('SonarQube Analysis') {
             steps {
-                sh './mvnw sonar:sonar -Dsonar.projectKey=my-springboot-app -Dsonar.host.url=http://localhost:9000 -Dsonar.login=YOUR_SONAR_TOKEN'
+                sh './mvnw sonar:sonar'
             }
         }
         stage('Build Docker Image') {
