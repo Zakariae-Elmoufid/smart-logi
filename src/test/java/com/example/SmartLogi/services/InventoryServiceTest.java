@@ -56,7 +56,7 @@ public class InventoryServiceTest {
         Inventory inventory = new Inventory();
         inventory.setId(1L);
         inventory.setQuantityOnHand(5);
-        InventoryMovementRequestDTO dto = new InventoryMovementRequestDTO(1L,10);
+        InventoryMovementRequestDTO dto = new InventoryMovementRequestDTO(inventory.getId(),10);
 
         when(inventoryRepository.findById(1L)).thenReturn(Optional.of(inventory));
 
