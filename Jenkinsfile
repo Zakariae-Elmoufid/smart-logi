@@ -3,8 +3,6 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = 'smartlogi:latest'
-        SONAR_HOST = 'http://localhost:9000'
-        SONAR_TOKEN = credentials('SonarQube_Local')
     }
 
     stages {
@@ -34,7 +32,7 @@ pipeline {
                         keepAll: true,
                         reportDir: 'target/site/jacoco',
                         reportFiles: 'index.html',
-                        reportName: 'JaCoCo Report'
+                        reportName: 'JaCoCo Coverage'
                     ])
                 }
             }
@@ -42,10 +40,15 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                sh "./mvnw sonar:sonar \
-                    -Dsonar.projectKey=SmartLogi \
-                    -Dsonar.host.url=http://localhost:9000 \
-                    -Dsonar.login=qu_9b126b24469c75d8ff742d001684c1116587fcdc"
+                withSonarQubeEnv('SonarQube_Local') {
+                    sh """
+                        ./mvnw sonar:sonar \
+                        -Dsonar.projectKey=SmartLogi \
+                        -Dsonar.projectName=SmartLogi \
+                        -Dsonar.host.url=$SONAR_HOST
+                        -Dsonar.login=\$SONAR_AUTH_TOKEN
+                    """
+                }
             }
         }
 
