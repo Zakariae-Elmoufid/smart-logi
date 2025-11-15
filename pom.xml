@@ -20,7 +20,11 @@
 
 	<properties>
 		<java.version>17</java.version>
+		<sonar.host.url>http://localhost:9000</sonar.host.url>
+		<sonar.login>squ_2f2b5c4a8266c2c0b95a380dc36fbc66a80a75cb</sonar.login>
 	</properties>
+
+
 
 	<dependencies>
 		<!-- Spring Boot Dependencies -->
@@ -142,25 +146,31 @@
 				</configuration>
 			</plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>3.5.0</version>
-				<configuration>
-					<argLine>-Xshare:off</argLine>
-				</configuration>
-			</plugin>
+<!--			<plugin>-->
+<!--				<groupId>org.apache.maven.plugins</groupId>-->
+<!--				<artifactId>maven-surefire-plugin</artifactId>-->
+<!--				<version>3.5.0</version>-->
+<!--				<configuration>-->
+<!--					<argLine>-Xshare:off</argLine>-->
+<!--				</configuration>-->
+<!--			</plugin>-->
 
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
 				<version>0.8.10</version>
+
 				<executions>
 					<execution>
+						<id>prepare-agent</id>
 						<goals>
 							<goal>prepare-agent</goal>
 						</goals>
+						<configuration>
+							<propertyName>jacoco.agent.argLine</propertyName>
+						</configuration>
 					</execution>
+
 					<execution>
 						<id>report</id>
 						<phase>verify</phase>
@@ -169,7 +179,43 @@
 						</goals>
 					</execution>
 				</executions>
+
+				<configuration>
+					<excludes>
+						<!-- Ignore DTOs -->
+						<exclude>**/dto/**</exclude>
+
+						<!-- Ignore Entities -->
+						<exclude>**/entities/**</exclude>
+
+						<exclude>**/controllers/**</exclude>
+
+						<!-- Ignore Mapper classes -->
+						<exclude>**/mapper/**</exclude>
+
+
+						<exclude>**/exception/**</exclude>
+
+						<!-- Ignore configuration classes (optional) -->
+						<exclude>**/config/**</exclude>
+
+
+						<!-- Ignore SmartLogiApplication (optional) -->
+<!--						<exclude>**/*Application*.class</exclude>-->
+					</excludes>
+				</configuration>
 			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.2.5</version>
+				<configuration>
+					<argLine>${jacoco.agent.argLine}</argLine>
+				</configuration>
+			</plugin>
+
+
 
 
 			<!-- Spring Boot Plugin -->

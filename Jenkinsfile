@@ -1,20 +1,27 @@
 pipeline {
     agent any
+
     environment {
-        DOCKER_IMAGE = 'SmartLogi:latest'
+        DOCKER_IMAGE = 'smartlogi:latest'
+        SONAR_HOST = 'http://localhost:9000'
+        SONAR_TOKEN = credentials('SONAR_TOKEN')
     }
+
     stages {
+
         stage('Checkout') {
             steps {
-                git  branch: 'devlop',  url: 'https://github.com/Zakariae-Elmoufid/smart-logi.git'
+                git branch: 'devlop', url: 'https://github.com/Zakariae-Elmoufid/smart-logi.git'
             }
         }
+
         stage('Build & Test') {
             steps {
-                sh './mvnw clean install'
+                sh './mvnw clean verify'
             }
         }
-        stage('Code Coverage') {
+
+        stage('Code Coverage (JaCoCo)') {
             steps {
                 sh './mvnw jacoco:report'
             }
@@ -22,30 +29,46 @@ pipeline {
                 always {
                     junit '**/target/surefire-reports/*.xml'
                     publishHTML(target: [
-                                allowMissing: false,
-                                alwaysLinkToLastBuild: true,
-                                keepAll: true,
-                                reportDir: 'target/site/jacoco',
-                                reportFiles: 'index.html',
-                                reportName: 'JaCoCo Report'
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'target/site/jacoco',
+                        reportFiles: 'index.html',
+                        reportName: 'JaCoCo Report'
                     ])
                 }
             }
         }
+
         stage('SonarQube Analysis') {
             steps {
-                 sh './mvnw clean verify sonar:sonar -Dsonar.host.url=http://sonarqube:9000 -Dsonar.login=squ_9b126b24469c75d8ff742d001684c1116587fcdc'
+                sh "./mvnw sonar:sonar \
+                    -Dsonar.projectKey=SmartLogi \
+                    -Dsonar.host.url=http://localhost:9000 \
+                    -Dsonar.login=qu_9b126b24469c75d8ff742d001684c1116587fcdc"
             }
         }
+
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $DOCKER_IMAGE .'
+                sh "docker build -t ${DOCKER_IMAGE} ."
             }
         }
+
         stage('Deploy') {
             steps {
+                sh 'chmod +x deploy.sh'
                 sh './deploy.sh'
             }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed!'
         }
     }
 }
