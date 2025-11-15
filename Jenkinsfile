@@ -45,11 +45,11 @@ pipeline {
                         ./mvnw sonar:sonar \
                         -Dsonar.projectKey=SmartLogi \
                         -Dsonar.projectName=SmartLogi \
-                        -Dsonar.host.url=$SSONAR_HOST_URL
+                        -Dsonar.host.url=$SONAR_HOST_URL
                         -Dsonar.login=\$SONAR_AUTH_TOKEN
                     """
                     withSonarQubeEnv('SonarQube') {
-                        sh "echo $SSONAR_HOST_URL"
+                        sh "echo $SONAR_HOST_URL"
                         sh "echo $SONAR_AUTH_TOKEN"
                     }
 
