@@ -4,7 +4,7 @@ pipeline {
     environment {
         DOCKER_IMAGE = 'smartlogi:latest'
         SONAR_HOST = 'http://localhost:9000'
-        SONAR_TOKEN = credentials('SONAR_TOKEN')
+        SONAR_TOKEN = credentials('SonarQube_Local')
     }
 
     stages {
