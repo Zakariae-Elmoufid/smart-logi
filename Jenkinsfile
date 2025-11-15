@@ -40,7 +40,7 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('SonarQube') {
+                withSonarQubeEnv('SonarQube_Local') {
                     sh """
                         ./mvnw sonar:sonar \
                         -Dsonar.projectKey=SmartLogi \
