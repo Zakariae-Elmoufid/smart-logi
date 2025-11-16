@@ -4,7 +4,7 @@ services:
   # PostgreSQL database for SonarQube or your projects
   db:
     image: postgres:17
-    container_name: postgres_db
+    container_name: postgres_smartlogi
     restart: always
     environment:
       POSTGRES_USER: user
@@ -18,17 +18,17 @@ services:
       - jenkins-net
 
   # pgAdmin to manage PostgreSQL
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: pgadmin
-    restart: always
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: admin
-    ports:
-      - "9090:80"
-    networks:
-      - jenkins-net
+#  pgadmin:
+#    image: dpage/pgadmin4
+#    container_name: pgadmin
+#    restart: always
+#    environment:
+#      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+#      PGADMIN_DEFAULT_PASSWORD: admin
+#    ports:
+#      - "9090:80"
+#    networks:
+#      - jenkins-net
 
   # Jenkins CI/CD
   jenkins:
