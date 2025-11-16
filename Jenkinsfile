@@ -40,13 +40,15 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                ./mvnw clean verify sonar:sonar \
-                  -Dsonar.host.url=http://localhost:9001
-                  -Dsonar.login=squ_8685854af949e298bb9da115e27ed2128d0d8022
-
-                }
+                // Run Maven command in shell
+                sh '''
+                    ./mvnw clean verify sonar:sonar \
+                      -Dsonar.host.url=http://localhost:9001 \
+                      -Dsonar.login=squ_8685854af949e298bb9da115e27ed2128d0d8022
+                '''
             }
         }
+
 
         stage('Build Docker Image') {
             steps {
