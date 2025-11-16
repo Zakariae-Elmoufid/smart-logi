@@ -2,7 +2,9 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'smartlogi:latest'
+        DOCKER_IMAGE = "smartlogi:latest"
+                SONAR_HOST_URL = "http://sonarqube:9000" // أو localhost إذا تعمل على نفس الحاوية
+                SONAR_TOKEN = credentials('SONAR_TOKEN') // يجب إضافة الـ token كـ Jenkins Credential
     }
 
     stages {
@@ -37,22 +39,15 @@ pipeline {
                 }
             }
         }
-stage('SonarQube Analysis') {
-    steps {
-        sh '''
-            # Load environment variables from .env
-            export $(grep -v '^#' .env | xargs)
-
-            # Verify the token is loaded
-            echo "Token loaded: $TOKEN"
-
-            # Run Maven SonarQube analysis
-            ./mvnw clean verify sonar:sonar \
-              -Dsonar.host.url=http://sonarqube:9000\
-              -Dsonar.login=$TOKEN
-        '''
-    }
-}
+        stage('SonarQube Analysis') {
+            steps {
+                sh '''
+                    ./mvnw clean verify sonar:sonar \
+                      -Dsonar.host.url=http://sonarqube:9000 \
+                      -Dsonar.login=${SONAR_TOKEN}
+                '''
+            }
+        }
 
 
 
