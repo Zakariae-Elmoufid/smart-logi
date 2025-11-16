@@ -42,6 +42,7 @@ pipeline {
            steps {
                sh '''
                    export $(grep -v '^#' .env | xargs)
+                    echo "Token loaded: $TOKEN"
                    ./mvnw clean verify sonar:sonar \
                      -Dsonar.host.url=http://localhost:9001 \
                      -Dsonar.login=$TOKEN
