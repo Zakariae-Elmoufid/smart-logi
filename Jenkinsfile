@@ -40,18 +40,9 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('sonarqueb_scaner') {
-                    sh """
-                        ./mvnw sonar:sonar \
-                        -Dsonar.projectKey=SmartLogi \
-                        -Dsonar.projectName=SmartLogi \
-                        -Dsonar.host.url=$SONAR_HOST_URL
-                        -Dsonar.login=\$SONAR_AUTH_TOKEN
-                    """
-                    withSonarQubeEnv('SonarQube') {
-                        sh "echo $SONAR_HOST_URL"
-                        sh "echo $SONAR_AUTH_TOKEN"
-                    }
+                ./mvnw clean verify sonar:sonar \
+                  -Dsonar.host.url=http://localhost:9001
+                  -Dsonar.login=squ_8685854af949e298bb9da115e27ed2128d0d8022
 
                 }
             }
