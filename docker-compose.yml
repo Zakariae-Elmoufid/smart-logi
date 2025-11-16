@@ -1,10 +1,6 @@
-version: '3.8'
-
 services:
-  # PostgreSQL database for SonarQube or your projects
   db:
     image: postgres:17
-    container_name: postgres_smartlogi
     restart: always
     environment:
       POSTGRES_USER: user
@@ -14,67 +10,15 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    networks:
-      - jenkins-net
 
-  # pgAdmin to manage PostgreSQL
-#  pgadmin:
-#    image: dpage/pgadmin4
-#    container_name: pgadmin
-#    restart: always
-#    environment:
-#      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-#      PGADMIN_DEFAULT_PASSWORD: admin
-#    ports:
-#      - "9090:80"
-#    networks:
-#      - jenkins-net
-
-  # Jenkins CI/CD
-  jenkins:
-    image: jenkins/jenkins:lts-jdk17
-    container_name: jenkins_test
-    privileged: true
-    user: root
-    ports:
-      - "8083:8080"
-      - "50001:50001"
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
     environment:
-      JAVA_OPTS: "-Djenkins.install.runSetupWizard=false"
-    volumes:
-      - jenkins_data:/var/jenkins_home
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./SmartLogi:/opt/projects/SmartLogi
-    networks:
-      - jenkins-net
-
-  # SonarQube for code quality analysis
-  sonarqube:
-    image: sonarqube:community
-    container_name: sonarqube
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
     ports:
-      - "9001:9000"
-    environment:
-      SONAR_JDBC_URL: jdbc:postgresql://db:5432/smart_logi
-      SONAR_JDBC_USERNAME: user
-      SONAR_JDBC_PASSWORD: password
-      SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: "true"
-    depends_on:
-      - db
-    volumes:
-      - sonarqube_data:/opt/sonarqube/data
-      - sonarqube_extensions:/opt/sonarqube/extensions
-      - sonarqube_logs:/opt/sonarqube/logs
-    networks:
-      - jenkins-net
+      - "9090:80"
 
 volumes:
   postgres_data:
-  jenkins_data:
-  sonarqube_data:
-  sonarqube_extensions:
-  sonarqube_logs:
-
-networks:
-  jenkins-net:
-    driver: bridge
