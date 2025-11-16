@@ -37,18 +37,22 @@ pipeline {
                 }
             }
         }
+stage('SonarQube Analysis') {
+    steps {
+        sh '''
+            # Load environment variables from .env
+            export $(grep -v '^#' .env | xargs)
 
-       stage('SonarQube Analysis') {
-           steps {
-               sh '''
-                   export $(grep -v '^#' .env | xargs)
-                    echo "Token loaded: $TOKEN"
-                   ./mvnw clean verify sonar:sonar \
-                     -Dsonar.host.url=http://<SONAR_HOST>:9001 \
-                     -Dsonar.login=$TOKEN
-               '''
-           }
-       }
+            # Verify the token is loaded
+            echo "Token loaded: $TOKEN"
+
+            # Run Maven SonarQube analysis
+            ./mvnw clean verify sonar:sonar \
+              -Dsonar.host.url=http://localhost:9001 \
+              -Dsonar.login=$TOKEN
+        '''
+    }
+}
 
 
 
