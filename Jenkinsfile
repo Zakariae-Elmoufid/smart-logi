@@ -3,8 +3,8 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = "smartlogi:latest"
-                SONAR_HOST_URL = "http://sonarqube:9000" // أو localhost إذا تعمل على نفس الحاوية
-                SONAR_TOKEN = credentials('SONAR_TOKEN') // يجب إضافة الـ token كـ Jenkins Credential
+        SONAR_HOST_URL = "http://sonarqube:9000"
+        SONAR_TOKEN = credentials('SONAR_TOKEN') // يجب إضافته في Jenkins
     }
 
     stages {
@@ -17,50 +17,63 @@ pipeline {
 
         stage('Build & Test') {
             steps {
-                sh './mvnw clean verify'
+                dir('/opt/projects/SmartLogi') {
+                    // Build the project with Maven
+                    sh 'mvn clean package'
+                }
             }
         }
 
         stage('Code Coverage (JaCoCo)') {
             steps {
-                sh './mvnw jacoco:report'
+                dir('/opt/projects/SmartLogi') {
+                    // Generate JaCoCo report
+                    sh 'mvn jacoco:report'
+                }
             }
             post {
                 always {
-                    junit '**/target/surefire-reports/*.xml'
-                    publishHTML(target: [
-                        allowMissing: false,
-                        alwaysLinkToLastBuild: true,
-                        keepAll: true,
-                        reportDir: 'target/site/jacoco',
-                        reportFiles: 'index.html',
-                        reportName: 'JaCoCo Coverage'
-                    ])
+                    dir('/opt/projects/SmartLogi') {
+                        junit '**/target/surefire-reports/*.xml'
+                        publishHTML(target: [
+                            allowMissing: false,
+                            alwaysLinkToLastBuild: true,
+                            keepAll: true,
+                            reportDir: 'target/site/jacoco',
+                            reportFiles: 'index.html',
+                            reportName: 'JaCoCo Coverage'
+                        ])
+                    }
                 }
             }
         }
+
         stage('SonarQube Analysis') {
             steps {
-                sh '''
-                    ./mvnw clean verify sonar:sonar \
-                      -Dsonar.host.url=http://sonarqube:9000 \
-                      -Dsonar.login=${SONAR_TOKEN}
-                '''
+                dir('/opt/projects/SmartLogi') {
+                    sh """
+                        mvn clean verify sonar:sonar \
+                        -Dsonar.host.url=${SONAR_HOST_URL} \
+                        -Dsonar.login=${SONAR_TOKEN}
+                    """
+                }
             }
         }
 
-
-
         stage('Build Docker Image') {
             steps {
-                sh "docker build -t ${DOCKER_IMAGE} ."
+                dir('/opt/projects/SmartLogi') {
+                    sh "docker build -t ${DOCKER_IMAGE} ."
+                }
             }
         }
 
         stage('Deploy') {
             steps {
-                sh 'chmod +x deploy.sh'
-                sh './deploy.sh'
+                dir('/opt/projects/SmartLogi') {
+                    sh 'chmod +x deploy.sh'
+                    sh './deploy.sh'
+                }
             }
         }
     }
@@ -68,7 +81,6 @@ pipeline {
     post {
         success {
             echo 'Pipeline completed successfully!'
-
         }
         failure {
             echo 'Pipeline failed!'
