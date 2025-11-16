@@ -38,17 +38,16 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
-            steps {
-                withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'TOKEN')]) {
-                    sh '''
-                        ./mvnw clean verify sonar:sonar \
-                          -Dsonar.host.url=http://localhost:9001 \
-                          -Dsonar.login=$TOKEN
-                    '''
-                }
-            }
-        }
+       stage('SonarQube Analysis') {
+           steps {
+               sh '''
+                   export $(grep -v '^#' .env | xargs)
+                   ./mvnw clean verify sonar:sonar \
+                     -Dsonar.host.url=http://localhost:9001 \
+                     -Dsonar.login=$TOKEN
+               '''
+           }
+       }
 
 
 
