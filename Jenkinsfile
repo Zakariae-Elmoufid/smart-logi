@@ -40,14 +40,16 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                // Run Maven command in shell
-                sh '''
-                    ./mvnw clean verify sonar:sonar \
-                      -Dsonar.host.url=http://localhost:9001 \
-                      -Dsonar.login=squ_8685854af949e298bb9da115e27ed2128d0d8022
-                '''
+                withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'TOKEN')]) {
+                    sh '''
+                        ./mvnw clean verify sonar:sonar \
+                          -Dsonar.host.url=http://localhost:9001 \
+                          -Dsonar.login=$TOKEN
+                    '''
+                }
             }
         }
+
 
 
         stage('Build Docker Image') {
