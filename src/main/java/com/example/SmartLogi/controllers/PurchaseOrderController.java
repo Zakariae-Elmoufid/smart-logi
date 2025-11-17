@@ -59,7 +59,7 @@ public class PurchaseOrderController {
     public ResponseEntity<ApiResponse> approvePurchaseOrder(@PathVariable Long id) {
         PurchaseOrderResponseDTO oder = purchaseOrderService.approvePurchaseOrder(id);
         ApiResponse response = ApiResponse.builder()
-                .message("Purchase Order canceled successfully!")
+                .message("Purchase Order approve successfully!")
                 .status(HttpStatus.OK.value())
                 .data(oder)
                 .build();

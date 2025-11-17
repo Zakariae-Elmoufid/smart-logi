@@ -181,7 +181,6 @@ public class InventoryService {
                     Math.max(0, inventory.getQuantityReserved() -
                             (line.getQuantityReserved() != null ? line.getQuantityReserved() : 0))
             );
-
             inventoryRepository.save(inventory);
         });
     }

@@ -127,29 +127,6 @@ public class SalesOrderService {
 
 
               inventoryService.reservedQuantity(line, warehouseId);
-//            Inventory inventory = inventoryRepository
-//                    .findByProductIdAndWarehouseId(line.getProduct().getId(), warehouseId)
-//                    .orElseThrow(() -> new ResourceNotFoundException("Inventory not found for product " + line.getProduct().getName()));
-//
-//            int available = inventory.getQuantityOnHand() - inventory.getQuantityReserved();
-//
-//
-//            int reserved = Math.min(line.getQuantityRequested(), available);
-//
-//
-//            inventory.setQuantityReserved(inventory.getQuantityReserved() + reserved);
-//            line.setQuantityReserved(reserved);
-//            line.setQuantityBackorder(line.getQuantityRequested() - reserved);
-//
-//            if (reserved == line.getQuantityRequested()) {
-//                line.setStatus(OrderLineStatus.RESERVED);
-//            } else if (reserved > 0) {
-//                line.setStatus(OrderLineStatus.PARTIALLY_RESERVED);
-//            } else {
-//                line.setStatus(OrderLineStatus.NOT_RESERVED);
-//            }
-//
-//            inventoryRepository.save(inventory);
 
 
             // Set warehouse only if not set yet
@@ -163,6 +140,7 @@ public class SalesOrderService {
         // Update order status based on lines
         if (order.getOrderLines().stream().allMatch(l -> l.getStatus() == OrderLineStatus.RESERVED)) {
             order.setOrderStatus(OrderStatus.RESERVED);
+            order.setReservedAt(LocalDateTime.now());
         } else if (order.getOrderLines().stream().anyMatch(l -> l.getQuantityReserved() > 0)) {
             order.setOrderStatus(OrderStatus.PARTIALLY_RESERVED);
         } else {
@@ -225,7 +203,7 @@ public class SalesOrderService {
                         .createdAt(LocalDateTime.now())
                         .description("transfer product form this warehouse to "+ w.warehouseId() +" for consolidate Quantity In this warehouse "+mainWarehouse.warehouseId())
                         .build();
-
+                inventoryMovementRepository.save(outbound);
                 inventoryRepository.save(inventory);
                 remainingToTransfer -= transferable;
 

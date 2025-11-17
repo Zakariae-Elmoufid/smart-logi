@@ -198,7 +198,7 @@
 
 						<!-- Ignore configuration classes (optional) -->
 						<exclude>**/config/**</exclude>
-
+						<exclude>**/services/**</exclude>
 
 						<!-- Ignore SmartLogiApplication (optional) -->
 <!--						<exclude>**/*Application*.class</exclude>-->

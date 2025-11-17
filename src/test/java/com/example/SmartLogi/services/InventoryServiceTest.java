@@ -1,16 +1,9 @@
 package com.example.SmartLogi.services;
 
 import com.example.SmartLogi.dto.InventoryMovementRequestDTO;
-import com.example.SmartLogi.dto.InventoryMovementResponseDTO;
-import com.example.SmartLogi.dto.InventoryResponseDTO;
-import com.example.SmartLogi.entities.Inventory;
-import com.example.SmartLogi.entities.InventoryMovement;
-import com.example.SmartLogi.entities.Product;
-import com.example.SmartLogi.entities.SalesOrderLine;
-import com.example.SmartLogi.enums.MovementType;
+import com.example.SmartLogi.entities.*;
 import com.example.SmartLogi.enums.OrderLineStatus;
 import com.example.SmartLogi.exception.BusinessException;
-import com.example.SmartLogi.exception.ResourceNotFoundException;
 import com.example.SmartLogi.mapper.InventoryMapper;
 import com.example.SmartLogi.mapper.InventoryMovementMapper;
 import com.example.SmartLogi.repositories.InventoryMovementRepository;
@@ -20,12 +13,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 
-import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
+import static org.hibernate.internal.util.collections.ArrayHelper.forEach;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -76,26 +68,48 @@ public class InventoryServiceTest {
                     .quantityReserved(40)
                     .product(product)
                     .build();
-
         SalesOrderLine salesOrderLine = SalesOrderLine.builder()
                 .id(1L)
                 .product(product)
                 .quantityRequested(60)
                 .build();
-
         when(inventoryRepository.findByProductIdAndWarehouseId(1L, 1L))
                 .thenReturn(Optional.of(inventory));
-
         inventoryService.reservedQuantity(salesOrderLine,1L);
-
         assertEquals(60, salesOrderLine.getQuantityReserved(), "Reserved quantity should match request");
         assertEquals(0, salesOrderLine.getQuantityBackorder(), "No backorder expected");
         assertEquals(OrderLineStatus.RESERVED, salesOrderLine.getStatus(), "Status should be RESERVED");
-
         assertEquals(100, inventory.getQuantityReserved(), "Inventory reserved count should be updated");
+        verify(inventoryRepository, times(1)).save(inventory);
+    }
 
+    @Test
+    void  releaseInventory_shouldReservedQuantityCorrectly() {
+        Product product =  Product.builder().id(1L).build();
+        Inventory inventory = Inventory.builder().id(1L)
+                .quantityOnHand(100)
+                .quantityReserved(60)
+                .product(product)
+                .build();
+        SalesOrderLine salesOrderLine = SalesOrderLine.builder()
+                .id(1L)
+                .product(product)
+                .quantityReserved(40)
+                .build();
+        SalesOrder salesOrder = SalesOrder.builder().id(1L)
+                .orderLines(List.of(salesOrderLine))
+                .warehouse(Warehouse.builder().id(1L).build())
+                .build();
+        when(inventoryRepository.findByProductIdAndWarehouseId(1L, 1L))
+                .thenReturn(Optional.of(inventory));
+        inventoryService.releaseInventory(salesOrder);
+        assertEquals(20, inventory.getQuantityReserved(),
+                "quantityReserved must be decreased by line.quantityReserved");
         verify(inventoryRepository, times(1)).save(inventory);
 
-
     }
+
+
+
+
 }
