@@ -1,32 +1,32 @@
 pipeline {
     agent any
 
-tools {
-    maven 'maven-3.8.9'
-    jdk 'jdk-17'
-}
+    tools {
+        maven 'maven-3.8.9'
+        jdk 'jdk-17'
+    }
 
     environment {
-        DOCKER_IMAGE = 'smartlogi:latest'
+        SONAR_TOKEN = credentials('sonar qube token')
     }
 
     stages {
 
         stage('Checkout') {
             steps {
-            checkout csm
+                checkout scm
             }
         }
 
         stage('Build & Test') {
             steps {
-                sh './mvnw clean verify'
+                sh 'mvn clean verify'
             }
         }
 
         stage('Code Coverage (JaCoCo)') {
             steps {
-                sh './mvnw jacoco:report'
+                sh 'mvn jacoco:report'
             }
             post {
                 always {
@@ -47,7 +47,7 @@ tools {
             steps {
                 withSonarQubeEnv('SonarQube_Local') {
                     sh '''
-                        ./mvnw sonar:sonar \
+                        mvn sonar:sonar \
                         -Dsonar.projectKey=SmartLogi \
                         -Dsonar.projectName=SmartLogi \
                         -Dsonar.java.coveragePlugin=jacoco \
@@ -59,32 +59,27 @@ tools {
                         -Dsonar.java.binaries=target/classes \
                         -Dsonar.java.test.binaries=target/test-classes
                     '''
-                    withSonarQubeEnv('SonarQube') {
-                        sh "echo $SONAR_HOST_URL"
-                        sh "echo $SONAR_AUTH_TOKEN"
-                    }
-
                 }
             }
         }
 
-       stage('Package') {
-                   steps {
-                       sh 'mvn package -DskipTests'
-                       archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
-                   }
-               }
-           }
+        stage('Package') {
+            steps {
+                sh 'mvn package -DskipTests'
+                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+            }
+        }
+    }
 
-           post {
-               always {
-                   echo "Build ${currentBuild.result} - ${env.JOB_NAME} #${env.BUILD_NUMBER}"
-               }
-               success {
-                   echo 'Pipeline exécuté avec succès!'
-               }
-               failure {
-                   echo 'Pipeline a échoué!'
-               }
-           }
+    post {
+        always {
+            echo "Build ${currentBuild.result} - ${env.JOB_NAME} #${env.BUILD_NUMBER}"
+        }
+        success {
+            echo 'Pipeline exécuté avec succès!'
+        }
+        failure {
+            echo 'Pipeline a échoué!'
+        }
+    }
 }
