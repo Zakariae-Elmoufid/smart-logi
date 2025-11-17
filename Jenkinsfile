@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+tools {
+    maven 'maven-3.8.9'
+    jdk 'jdk-17'
+}
+
     environment {
         DOCKER_IMAGE = 'smartlogi:latest'
     }
@@ -9,7 +14,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                git branch: 'devlop', url: 'https://github.com/Zakariae-Elmoufid/smart-logi.git'
+            checkout csm
             }
         }
 
@@ -41,13 +46,19 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube_Local') {
-                    sh """
+                    sh '''
                         ./mvnw sonar:sonar \
                         -Dsonar.projectKey=SmartLogi \
                         -Dsonar.projectName=SmartLogi \
+                        -Dsonar.java.coveragePlugin=jacoco \
+                        -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
+                        -Dsonar.junit.reportPaths=target/surefire-reports \
                         -Dsonar.host.url=http://sonarqube:9000 \
-                        -Dsonar.login=\$SONAR_AUTH_TOKEN
-                    """
+                        -Dsonar.sources=src/main/java \
+                        -Dsonar.tests=src/test/java \
+                        -Dsonar.java.binaries=target/classes \
+                        -Dsonar.java.test.binaries=target/test-classes
+                    '''
                     withSonarQubeEnv('SonarQube') {
                         sh "echo $SONAR_HOST_URL"
                         sh "echo $SONAR_AUTH_TOKEN"
@@ -57,27 +68,23 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
-            steps {
-                sh "docker build -t ${DOCKER_IMAGE} ."
-            }
-        }
+       stage('Package') {
+                   steps {
+                       sh 'mvn package -DskipTests'
+                       archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+                   }
+               }
+           }
 
-        stage('Deploy') {
-            steps {
-                sh 'chmod +x deploy.sh'
-                sh './deploy.sh'
-            }
-        }
-    }
-
-    post {
-        success {
-            echo 'Pipeline completed successfully!'
-
-        }
-        failure {
-            echo 'Pipeline failed!'
-        }
-    }
+           post {
+               always {
+                   echo "Build ${currentBuild.result} - ${env.JOB_NAME} #${env.BUILD_NUMBER}"
+               }
+               success {
+                   echo 'Pipeline exécuté avec succès!'
+               }
+               failure {
+                   echo 'Pipeline a échoué!'
+               }
+           }
 }
