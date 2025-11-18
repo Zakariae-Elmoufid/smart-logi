@@ -53,7 +53,6 @@ pipeline {
                         -Dsonar.java.coveragePlugin=jacoco \
                         -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
                         -Dsonar.junit.reportPaths=target/surefire-reports \
-                        -Dsonar.host.url=http://sonarqube:9000 \
                         -Dsonar.sources=src/main/java \
                         -Dsonar.tests=src/test/java \
                         -Dsonar.java.binaries=target/classes \
@@ -65,7 +64,9 @@ pipeline {
 
          stage(' Quality Gate') {
                     steps {
-                        waitForQualityGate abortPipeline: true
+                        timeout(time: 10, unit: 'MINUTES') {
+                            waitForQualityGate abortPipeline: true
+                        }
                     }
          }
 
