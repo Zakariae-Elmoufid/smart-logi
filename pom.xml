@@ -22,6 +22,8 @@
 		<java.version>17</java.version>
 	</properties>
 
+
+
 	<dependencies>
 		<!-- Spring Boot Dependencies -->
 		<dependency>
@@ -36,6 +38,7 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
@@ -81,12 +84,26 @@
 		</dependency>
 
 
+
+
 		<!-- Testing -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+
+
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -118,6 +135,77 @@
 					</annotationProcessorPaths>
 				</configuration>
 			</plugin>
+
+<!--			<plugin>-->
+<!--				<groupId>org.apache.maven.plugins</groupId>-->
+<!--				<artifactId>maven-surefire-plugin</artifactId>-->
+<!--				<version>3.5.0</version>-->
+<!--				<configuration>-->
+<!--					<argLine>-Xshare:off</argLine>-->
+<!--				</configuration>-->
+<!--			</plugin>-->
+
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.8.10</version>
+
+				<executions>
+					<execution>
+						<id>prepare-agent</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+						<configuration>
+							<propertyName>jacoco.agent.argLine</propertyName>
+						</configuration>
+					</execution>
+
+					<execution>
+						<id>report</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
+
+				<configuration>
+					<excludes>
+						<!-- Ignore DTOs -->
+						<exclude>**/dto/**</exclude>
+
+						<!-- Ignore Entities -->
+						<exclude>**/entities/**</exclude>
+
+						<exclude>**/controllers/**</exclude>
+
+						<!-- Ignore Mapper classes -->
+						<exclude>**/mapper/**</exclude>
+
+
+						<exclude>**/exception/**</exclude>
+
+						<!-- Ignore configuration classes (optional) -->
+						<exclude>**/config/**</exclude>
+
+						<!-- Ignore SmartLogiApplication (optional) -->
+<!--						<exclude>**/*Application*.class</exclude>-->
+					</excludes>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.2.5</version>
+				<configuration>
+					<argLine>${jacoco.agent.argLine}</argLine>
+				</configuration>
+			</plugin>
+
+
+
 
 			<!-- Spring Boot Plugin -->
 			<plugin>

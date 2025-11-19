@@ -1,10 +1,10 @@
 package com.example.SmartLogi.controllers;
 
 
-import com.example.SmartLogi.dto.ClientRequestDTO;
-import com.example.SmartLogi.dto.ClientResponseDTO;
-import com.example.SmartLogi.entities.Client;
+import com.example.SmartLogi.dto.*;
+import com.example.SmartLogi.entities.*;
 import com.example.SmartLogi.services.ClientService;
+import com.example.SmartLogi.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,11 +18,22 @@ public class AuthController {
 
     @Autowired
     private ClientService clientService;
+    @Autowired
+    private UserService userService;
 
     @PostMapping("/api/register")
     public ResponseEntity<ClientResponseDTO> register(@Valid @RequestBody ClientRequestDTO dto) {
         ClientResponseDTO createdClient = clientService.createClient(dto);
         return ResponseEntity.ok(createdClient);
+    }
+
+
+
+
+    @PostMapping("/api/login")
+    public ResponseEntity<UserResponseDTO> login(@Valid @RequestBody UserRequestDTO dto) {
+        UserResponseDTO userLoged = userService.findUserByEmailAndByPassword(dto);
+        return ResponseEntity.ok(userLoged);
     }
 
 }

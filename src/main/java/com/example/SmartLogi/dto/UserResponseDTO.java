@@ -1,0 +1,5 @@
+package com.example.SmartLogi.dto;
+
+
+public record UserResponseDTO (Long id, String firstName, String lastName, String email) {
+}

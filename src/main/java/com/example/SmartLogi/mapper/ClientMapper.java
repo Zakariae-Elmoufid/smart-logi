@@ -7,7 +7,6 @@ import com.example.SmartLogi.entities.Client;
 import com.example.SmartLogi.enums.UserRole;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")

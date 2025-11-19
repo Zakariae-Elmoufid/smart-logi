@@ -3,9 +3,15 @@ package com.example.SmartLogi.entities;
 
 import com.example.SmartLogi.enums.MovementType;
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name="inventory_movement")
 public class InventoryMovement {
@@ -30,5 +36,4 @@ public class InventoryMovement {
     @JoinColumn(name = "inventory_id")
     private Inventory inventory;
 
-    public InventoryMovement() {}
 }

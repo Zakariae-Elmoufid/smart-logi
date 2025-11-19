@@ -1,9 +1,20 @@
 package com.example.SmartLogi.entities;
 
+import com.example.SmartLogi.entities.Inventory;
+import com.example.SmartLogi.entities.WarehouseManager;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import java.util.List;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "warehouses")
 public class Warehouse {
@@ -28,32 +39,25 @@ public class Warehouse {
     @OneToMany(mappedBy = "warehouse", cascade = CascadeType.ALL)
     private List<Inventory> inventories;
 
-    // Constructors
-    public Warehouse() {}
+    @OneToMany(mappedBy = "warehouse" )
+    private List<PurchaseOrder> purchaseOrders;
 
-    public Warehouse(String name, String address, String code) {
-        this.name = name;
-        this.address = address;
-        this.code = code;
-        this.active = true;
+
+
+
+    @ManyToMany(mappedBy = "warehouses", fetch = FetchType.LAZY)
+    private Set<WarehouseManager> managers = new HashSet<>();
+
+    public void addManager(WarehouseManager manager) {
+        this.managers.add(manager);
+        manager.getWarehouses().add(this);
     }
 
-    // Getters & Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public void removeManager(WarehouseManager manager) {
+        this.managers.remove(manager);
+        manager.getWarehouses().remove(this);
+    }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
 
-    public String getAddress() { return address; }
-    public void setAddress(String address) { this.address = address; }
 
-    public String getCode() { return code; }
-    public void setCode(String code) { this.code = code; }
-
-    public boolean isActive() { return active; }
-    public void setActive(boolean active) { this.active = active; }
-
-    public List<Inventory> getInventories() { return inventories; }
-    public void setInventories(List<Inventory> inventories) { this.inventories = inventories; }
 }

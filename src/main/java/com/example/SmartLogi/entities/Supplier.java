@@ -1,9 +1,15 @@
 package com.example.SmartLogi.entities;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.util.List;
 
+@Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name ="supplier")
 public class Supplier {
@@ -19,5 +25,4 @@ public class Supplier {
     @OneToMany(mappedBy = "supplier")
     private List<PurchaseOrder> purchaseOrders;
 
-    public Supplier() {}
 }
