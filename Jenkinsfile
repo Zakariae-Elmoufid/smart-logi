@@ -6,9 +6,7 @@ pipeline {
         jdk 'jdk-17'
     }
 
-    environment {
-        SONAR_TOKEN = credentials('d3a20b6a-ce0a-4c1f-88ff-0dcb44434bae')
-    }
+
 
     stages {
 
@@ -31,6 +29,13 @@ pipeline {
             post {
                 always {
                     junit '**/target/surefire-reports/*.xml'
+                    jacoco execPattern: '**/target/jacoco.exec',
+                                       classPattern: '**/target/classes',
+                                       sourcePattern: '**/src/main/java',
+                                       inclusionPattern: '**/*.class',
+                                       minimumInstructionCoverage: 14,
+                                       minimumBranchCoverage: 12
+
                     publishHTML(target: [
                         allowMissing: false,
                         alwaysLinkToLastBuild: true,

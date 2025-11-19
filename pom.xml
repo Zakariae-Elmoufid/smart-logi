@@ -20,8 +20,6 @@
 
 	<properties>
 		<java.version>17</java.version>
-<!--		<sonar.host.url>http://localhost:9001</sonar.host.url>-->
-<!--		<sonar.login>squ_8685854af949e298bb9da115e27ed2128d0d8022</sonar.login>-->
 	</properties>
 
 
@@ -190,7 +188,6 @@
 
 						<!-- Ignore configuration classes (optional) -->
 						<exclude>**/config/**</exclude>
-						<exclude>**/services/**</exclude>
 
 						<!-- Ignore SmartLogiApplication (optional) -->
 <!--						<exclude>**/*Application*.class</exclude>-->
