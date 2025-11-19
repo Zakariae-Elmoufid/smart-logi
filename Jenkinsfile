@@ -35,7 +35,6 @@ pipeline {
                                        inclusionPattern: '**/*.class',
                                        minimumInstructionCoverage: 14,
                                        minimumBranchCoverage: 1
-
                     publishHTML(target: [
                         allowMissing: false,
                         alwaysLinkToLastBuild: true,
