@@ -157,7 +157,12 @@ public class SalesOrderService {
                 .mapToInt(WarehouseInventoryProjection::quantityHand)
                 .sum();
             System.out.println("totalAvailable :" +  totalAvailable);
-        //  Check if any warehouse can handle all
+
+        if (totalAvailable < quantityRequested || totalAvailable == 0) {
+            System.out.println("totalAvailable = " + totalAvailable + ", quantityRequested = " + quantityRequested);
+
+            return -1L;
+        }
         for (WarehouseInventoryProjection w : warehouses) {
             if (w.quantityHand() >= totalAvailable) {
                 System.out.println("warehouse Id that has all qauntity  : "+w.warehouseId());
@@ -166,9 +171,8 @@ public class SalesOrderService {
             }
         }
 
-        if (totalAvailable < quantityRequested) {
-            return -1L;
-        }
+
+
 
         //  Select main warehouse
         WarehouseInventoryProjection mainWarehouse = warehouses.stream()

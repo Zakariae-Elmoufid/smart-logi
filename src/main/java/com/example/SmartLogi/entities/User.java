@@ -37,6 +37,7 @@ public class User {
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
+
     @NotBlank(message = "Password is required")
     @Size(min = 6, message = "Password must be at least 6 characters long")
     @Column(nullable = false)
@@ -54,6 +55,7 @@ public class User {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    private boolean enabled = true;
 
 
 //    public Long getId() { return id; }
