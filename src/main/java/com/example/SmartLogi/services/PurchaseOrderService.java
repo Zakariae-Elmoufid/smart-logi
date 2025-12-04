@@ -15,10 +15,14 @@ import com.example.SmartLogi.mapper.PurchaseOrderMapper;
 import com.example.SmartLogi.repositories.*;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+
+import static com.example.SmartLogi.enums.PurchaseOrderStatus.RECEIVED;
 
 @Service
 @AllArgsConstructor
@@ -32,6 +36,7 @@ public class PurchaseOrderService {
     private final InventoryRepository inventoryRepository;
     private final InventoryMovementRepository inventoryMovementRepository;
     private final InventoryMovementMapper  inventoryMovementMapper;
+    private final SalesOrderService salesOrderService;
 
     public PurchaseOrderResponseDTO create(PurchaseOrderRequestDTO dto) {
          Supplier supplier = supplierRepository.findById(dto.supplierId())
@@ -82,43 +87,35 @@ public class PurchaseOrderService {
     }
 
     @Transactional
-    public InventoryMovementResponseDTO receiveProduct(Long purchaseOrderId, ReceivePurchaseOrderRequestDTO dto) {
+    public void  receiveProduct(Long purchaseOrderId) {
         PurchaseOrder po = purchaseOrderRepository.findById(purchaseOrderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Purchase Order not found"));
 
-        PurchaseOrderLine line = po.getOrderLines().stream()
-                .filter(l -> l.getProduct().getId().equals(dto.productId()))
-                .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found in order"));
+        List<Long> productIds = new ArrayList<Long>();
+        po.getOrderLines().forEach(line -> {
+            Inventory inventory =  inventoryRepository.findByProductIdAndWarehouseId(line.getProduct().getId(),po.getWarehouse().getId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Inventory not found"));
+            productIds.add(line.getProduct().getId());
+            inventory.setQuantityOnHand(inventory.getQuantityOnHand() + line.getQuantity());
+            inventoryRepository.save(inventory);
+            InventoryMovement inventoryMovement =  InventoryMovement.builder()
+                    .movementType(MovementType.INBOUND)
+                    .description("received product "+line.getProduct().getSku() +" from purchase order "+po.getId())
+                    .inventory(inventory)
+                    .quantity(line.getQuantity())
+                    .createdAt(LocalDateTime.now())
+                    .build();
+            inventoryMovementRepository.save(inventoryMovement);
 
-        Inventory inventory = inventoryRepository.findByProductIdAndWarehouseId(line.getProduct().getId(),po.getWarehouse().getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Inventory not found"));
+        });
 
-        InventoryMovement inventoryMovement =  InventoryMovement.builder()
-                .movementType(MovementType.INBOUND)
-                .inventory(inventory)
-                .quantity(dto.receivedQty())
-                .createdAt(LocalDateTime.now())
-                .build();
-          inventoryMovementRepository.save(inventoryMovement);
-
-        inventory.setQuantityOnHand(inventory.getQuantityOnHand() + dto.receivedQty());
-        inventoryRepository.save(inventory);
-
-        int totalOrdered = po.getOrderLines().stream()
-                .mapToInt(PurchaseOrderLine::getQuantity)
-                .sum();
-
-        int totalReceived = inventoryMovementRepository.getTotalReceivedQuantity(
-                line.getProduct().getId(),
-                po.getWarehouse().getId(),
-                po.getId(),
-                MovementType.INBOUND
-        );
-        po.setOrderStatus(totalReceived >= totalOrdered ? PurchaseOrderStatus.RECEIVED : PurchaseOrderStatus.PARTIALLY_RECEIVED);
+        po.setOrderStatus(RECEIVED);
         purchaseOrderRepository.save(po);
-        return inventoryMovementMapper.toDTO(inventoryMovement);
+
+        salesOrderService.reservedBackOrder(po.getWarehouse().getId(),productIds);
     }
+
+
 
 
 

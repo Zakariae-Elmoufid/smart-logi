@@ -28,7 +28,6 @@ public class ClientService {
     private PasswordEncoder passwordEncoder;
 
     public ClientResponseDTO createClient(ClientRequestDTO dto) {
-//        Client client = clientMapper.toEntity(dto);
         Client client = Client.builder()
                 .firstName(dto.firstName())
                 .lastName(dto.lastName())
@@ -37,7 +36,7 @@ public class ClientService {
                 .phoneNumber(dto.phoneNumber())
                 .role(UserRole.CLIENT)
                 .createdAt(LocalDateTime.now())
-                .active(true)
+                .enabled(true)
                 .enabled(true)
                 .build();
         return clientMapper.toDto(clientRepository.save(client));

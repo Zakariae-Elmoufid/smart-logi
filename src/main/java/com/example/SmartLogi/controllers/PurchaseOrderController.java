@@ -67,12 +67,11 @@ public class PurchaseOrderController {
     }
 
         @PostMapping("/{poId}/receive")
-    public ResponseEntity<ApiResponse> receivePurchaseOrder(@PathVariable Long poId , @Valid @RequestBody ReceivePurchaseOrderRequestDTO dto) {
-         InventoryMovementResponseDTO inventoryMovement = purchaseOrderService.receiveProduct(poId,dto) ;
+    public ResponseEntity<ApiResponse> receivePurchaseOrder(@PathVariable Long poId) {
+          purchaseOrderService.receiveProduct(poId) ;
          ApiResponse response = ApiResponse.builder()
-                 .message("Product received successfully")
+                 .message("order received successfully")
                  .status(HttpStatus.OK.value())
-                 .data(inventoryMovement)
                  .build();
          return new ResponseEntity<>(response, HttpStatus.OK);
     }
