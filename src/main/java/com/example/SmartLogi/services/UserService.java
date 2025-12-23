@@ -12,6 +12,9 @@ import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +39,8 @@ public class UserService implements ApplicationContextAware  , BeanNameAware {
 
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private UserDetailsService userDetailsService;
 
     public UserResponseDTO findUserByEmailAndByPassword(UserRequestDTO dto){
         User user = userRepository.findByEmail(dto.email())
@@ -67,4 +72,15 @@ public class UserService implements ApplicationContextAware  , BeanNameAware {
         return "Password updated successfully";
     }
 
+    public String loadUserRole(String username) {
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+        String role = userDetails.getAuthorities()
+                .stream()
+                .findFirst()
+                .map(GrantedAuthority::getAuthority)
+                .orElseThrow(() -> new RuntimeException("Utilisateur n'a pas de rôle"));
+
+        return role;
+    }
 }
