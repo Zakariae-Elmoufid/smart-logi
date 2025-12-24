@@ -66,4 +66,28 @@ import java.util.Map;
         response.put("error", ex.getMessage());
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<Map<String, Object>> handleUnauthorizedException(UnauthorizedException ex, HttpServletRequest req) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of(
+                "error", "Not authenticated",
+                "message" , ex.getMessage(),
+                "timestamp", LocalDateTime.now(),
+                "status", HttpStatus.UNAUTHORIZED.value(),
+                "path", req.getRequestURI()
+
+        ));
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<Map<String, Object>> handleForbiddenException(ForbiddenException ex, HttpServletRequest req) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of(
+                "error", "You don’t have permission",
+                "message",ex.getMessage(),
+                "timestamp",LocalDateTime.now(),
+                "status", HttpStatus.FORBIDDEN.value(),
+                "path", req.getRequestURI()
+        ));
+    }
+
 }
