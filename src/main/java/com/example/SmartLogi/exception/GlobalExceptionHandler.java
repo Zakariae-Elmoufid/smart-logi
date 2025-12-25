@@ -4,6 +4,7 @@ import com.example.SmartLogi.dto.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -89,5 +90,19 @@ import java.util.Map;
                 "path", req.getRequestURI()
         ));
     }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<?> handleBadCredentials(BadCredentialsException ex,HttpServletRequest req) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                Map.of(
+                        "error", "Bad credentials",
+                        "message",ex.getMessage(),
+                        "timestamp",LocalDateTime.now(),
+                        "status", HttpStatus.UNAUTHORIZED.value(),
+                        "path", req.getRequestURI()
+                ));
+    }
+
+
 
 }
