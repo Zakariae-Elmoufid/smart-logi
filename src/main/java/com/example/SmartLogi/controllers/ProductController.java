@@ -38,9 +38,9 @@ public class ProductController {
         List<ProductResponseDTO> products = productService.getAllProducts();
         ApiResponse response =  ApiResponse.builder().message("All products")
                 .data(products)
-                .status(HttpStatus.CREATED.value()).build();
+                .status(HttpStatus.OK.value()).build();
 
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
