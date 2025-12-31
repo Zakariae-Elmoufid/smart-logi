@@ -24,19 +24,18 @@ public class ClientService {
     @Autowired
     private  ClientMapper clientMapper;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+//    @Autowired
+//    private PasswordEncoder passwordEncoder;
 
     public ClientResponseDTO createClient(ClientRequestDTO dto) {
         Client client = Client.builder()
                 .firstName(dto.firstName())
                 .lastName(dto.lastName())
                 .email(dto.email())
-                .password(passwordEncoder.encode(dto.password()))
+//                .password(passwordEncoder.encode(dto.password()))
                 .phoneNumber(dto.phoneNumber())
                 .role(UserRole.CLIENT)
                 .createdAt(LocalDateTime.now())
-                .enabled(true)
                 .enabled(true)
                 .build();
         return clientMapper.toDto(clientRepository.save(client));

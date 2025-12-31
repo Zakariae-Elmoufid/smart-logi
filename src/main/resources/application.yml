@@ -1,0 +1,18 @@
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8180/realms/smartLogiRealm
+          jwk-set-uri: http://localhost:8180/realms/smartLogiRealm/protocol/openid-connect/certs
+
+jwt:
+  auth:
+    converter:
+      resource-id: smartlogi-backend
+      principal-attribute: principal_username
+logging:
+  level:
+    org.springframework.security: TRACE
+

@@ -18,26 +18,26 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @PutMapping("/{id}/change-password")
-    public ResponseEntity<ApiResponse> changePassword(
-            @PathVariable Long id,
-            @Valid @RequestBody PasswordChangeDTO dto) {
-
-        String message = userService.changePassword(id, dto);
-
-        HttpStatus status;
-        if (message.equals("Password updated successfully")) {
-            status = HttpStatus.OK;
-        } else {
-            status = HttpStatus.BAD_REQUEST;
-        }
-
-        return ResponseEntity.status(status).body(
-                ApiResponse.builder()
-                        .message(message)
-                        .data(null)
-                        .status(status.value())
-                        .build()
-        );
-    }
+//    @PutMapping("/{id}/change-password")
+//    public ResponseEntity<ApiResponse> changePassword(
+//            @PathVariable Long id,
+//            @Valid @RequestBody PasswordChangeDTO dto) {
+//
+//        String message = userService.changePassword(id, dto);
+//
+//        HttpStatus status;
+//        if (message.equals("Password updated successfully")) {
+//            status = HttpStatus.OK;
+//        } else {
+//            status = HttpStatus.BAD_REQUEST;
+//        }
+//
+//        return ResponseEntity.status(status).body(
+//                ApiResponse.builder()
+//                        .message(message)
+//                        .data(null)
+//                        .status(status.value())
+//                        .build()
+//        );
+//    }
 }

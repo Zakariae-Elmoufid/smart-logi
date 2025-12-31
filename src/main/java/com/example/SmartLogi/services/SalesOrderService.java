@@ -60,7 +60,6 @@ public class SalesOrderService {
     private SalesOrderLineMapper  salesOrderLineMapper;
 
 
-
     @Transactional
     public SalesOrderResponseDTO create(SalesOrderRequestDTO dto) {
         Client client = clientRepository.findById(dto.clientId())
@@ -104,6 +103,7 @@ public class SalesOrderService {
                 .collect(Collectors.joining("; "));
 
         SalesOrderResponseDTO mappedOrder = salesOrderMapper.toDTO(salesOrderRepository.save(order));
+
         return new SalesOrderResponseDTO(
                 mappedOrder.id(),
                 mappedOrder.clientId(),
@@ -111,6 +111,7 @@ public class SalesOrderService {
                 mappedOrder.orderLines(),
                 message
         );
+
     }
 
     @Transactional

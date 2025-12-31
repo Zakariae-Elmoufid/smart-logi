@@ -37,7 +37,7 @@ public class WarehouseManagerService {
                  .firstName(dto.firstName())
                  .lastName(dto.firstName())
                  .email(dto.email())
-                 .password(PasswordUtils.hash(dto.password()))
+//                 .password(PasswordUtils.hash(dto.password()))
                  .role(UserRole.WAREHOUSE_MANAGER)
                  .createdAt(LocalDateTime.now())
                  .enabled(true)

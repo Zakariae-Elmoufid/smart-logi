@@ -38,18 +38,18 @@ public class User {
     private String email;
 
 
-    @NotBlank(message = "Password is required")
-    @Size(min = 6, message = "Password must be at least 6 characters long")
-    @Column(nullable = false)
-    private String password;
+//    @NotBlank(message = "Password is required")
+//    @Size(min = 6, message = "Password must be at least 6 characters long")
+//    @Column(nullable = false)
+//    private String password;
+
+    @Column(name = "keycloak_id", nullable = false, unique = true)
+    private String keycloakId;
 
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     protected UserRole role;
-
-//    @Column(name = "is_active", nullable = false)
-//    private boolean active = true;
 
 
     @Column(name = "created_at", nullable = false, updatable = false)

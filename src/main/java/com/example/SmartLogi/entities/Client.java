@@ -28,17 +28,5 @@ public class Client extends User {
     @JsonIgnore
     private List<SalesOrder> orders;
 
-    // Constructors
-//    public Client() {}
-//
-//    public Client(String firstName, String lastName, String email, String password, String phoneNumber) {
-//        super(firstName, lastName, email, password, UserRole.CLIENT);
-//        this.phoneNumber = phoneNumber;
-//    }
 
-    // Getter & Setter
-
-
-//    public String getPhoneNumber() { return phoneNumber; }
-//    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
 }
