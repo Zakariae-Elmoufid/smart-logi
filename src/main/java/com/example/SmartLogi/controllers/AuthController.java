@@ -67,7 +67,6 @@ public class AuthController {
 
             String refreshToken = refreshTokenService.generateRefreshToken(dto.email());
 
-            // Retourner les deux tokens
             return ResponseEntity.ok(Map.of(
                     "accessToken", accessToken,
                     "refreshToken", refreshToken,
@@ -96,6 +95,9 @@ public class AuthController {
                 "accessToken", newAccessToken
         ));
     }
+
+
+
 
 
 }
