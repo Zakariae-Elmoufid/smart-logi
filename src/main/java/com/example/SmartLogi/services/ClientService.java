@@ -8,6 +8,7 @@ import com.example.SmartLogi.mapper.ClientMapper;
 import com.example.SmartLogi.repositories.ClientRepository;
 import com.example.SmartLogi.util.PasswordUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -23,19 +24,20 @@ public class ClientService {
     @Autowired
     private  ClientMapper clientMapper;
 
-
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public ClientResponseDTO createClient(ClientRequestDTO dto) {
-//        Client client = clientMapper.toEntity(dto);
         Client client = Client.builder()
                 .firstName(dto.firstName())
                 .lastName(dto.lastName())
                 .email(dto.email())
-                .password(PasswordUtils.hash(dto.password()))
+                .password(passwordEncoder.encode(dto.password()))
                 .phoneNumber(dto.phoneNumber())
                 .role(UserRole.CLIENT)
                 .createdAt(LocalDateTime.now())
-                .active(true)
+                .enabled(true)
+                .enabled(true)
                 .build();
         return clientMapper.toDto(clientRepository.save(client));
     }

@@ -2,16 +2,29 @@ package com.example.SmartLogi.controllers;
 
 
 import com.example.SmartLogi.dto.*;
-import com.example.SmartLogi.entities.*;
+import com.example.SmartLogi.entities.RefreshToken;
 import com.example.SmartLogi.services.ClientService;
+import com.example.SmartLogi.services.JwtService;
+import com.example.SmartLogi.services.RefreshTokenService;
+import com.example.SmartLogi.services.TokenBlacklistService;
 import com.example.SmartLogi.services.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.Map;
 
 @RestController
 public class AuthController {
@@ -20,8 +33,18 @@ public class AuthController {
     private ClientService clientService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private AuthenticationManager authenticationManager;
+    @Autowired
+    private JwtService jwtService;
+    @Autowired
+    private RefreshTokenService refreshTokenService;
+    @Autowired
+    private TokenBlacklistService tokenBlacklistService;
 
-    @PostMapping("/api/register")
+
+
+    @PostMapping("/api/auth/register")
     public ResponseEntity<ClientResponseDTO> register(@Valid @RequestBody ClientRequestDTO dto) {
         ClientResponseDTO createdClient = clientService.createClient(dto);
         return ResponseEntity.ok(createdClient);
@@ -30,10 +53,73 @@ public class AuthController {
 
 
 
-    @PostMapping("/api/login")
-    public ResponseEntity<UserResponseDTO> login(@Valid @RequestBody UserRequestDTO dto) {
-        UserResponseDTO userLoged = userService.findUserByEmailAndByPassword(dto);
-        return ResponseEntity.ok(userLoged);
+    @PostMapping("/api/auth/login")
+    public ResponseEntity<?> login(@Valid @RequestBody UserRequestDTO dto) {
+
+        Authentication auth = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(dto.email(), dto.password())
+        );
+
+        if(auth.isAuthenticated()){
+            String dbRole = auth.getAuthorities()
+                    .stream()
+                    .findFirst()
+                    .map(GrantedAuthority::getAuthority)
+                    .orElseThrow(() -> new RuntimeException("user have't role !"));
+
+            String roleForToken = dbRole.startsWith("ROLE_") ? dbRole : "ROLE_" + dbRole;
+            String accessToken = jwtService.generateToken(dto.email(), roleForToken);
+
+            String refreshToken = refreshTokenService.generateRefreshToken(dto.email());
+
+            return ResponseEntity.ok(Map.of(
+                    "accessToken", accessToken,
+                    "refreshToken", refreshToken,
+                    "role", roleForToken,
+                    "email", dto.email()
+            ));
+        }
+         throw new UsernameNotFoundException("Invalid user request!");
+
     }
+    @PostMapping("/api/auth/refresh-token")
+    public ResponseEntity<?> refreshToken(@RequestBody Map<String, String> request) {
+        String requestToken = request.get("refreshToken");
+
+        RefreshToken refreshToken = refreshTokenService.validateRefreshToken(requestToken);
+
+        if(refreshToken.getExpiryDate().isBefore(LocalDateTime.now())){
+            throw new RuntimeException("Refresh token expired");
+        }
+
+        String role = userService.loadUserRole(refreshToken.getUsername());
+
+        String newAccessToken = jwtService.generateToken(refreshToken.getUsername(), role);
+
+        return ResponseEntity.ok(Map.of(
+                "accessToken", newAccessToken
+        ));
+    }
+
+    @PostMapping("/api/auth/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request, @RequestBody Map<String, String> body) {
+        // Blacklist the access token
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String accessToken = authHeader.substring(7);
+            tokenBlacklistService.blacklistToken(accessToken);
+        }
+
+        // Revoke the refresh token
+        String refreshToken = body.get("refreshToken");
+        if (refreshToken != null) {
+            refreshTokenService.revoke(refreshToken);
+        }
+
+        return ResponseEntity.ok(Map.of(
+                "message", "Logged out successfully"
+        ));
+    }
+
 
 }

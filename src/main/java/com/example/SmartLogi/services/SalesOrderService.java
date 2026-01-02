@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static com.example.SmartLogi.enums.OrderLineStatus.PARTIALLY_RESERVED;
+
 @Service
 public class SalesOrderService {
 
@@ -157,7 +159,12 @@ public class SalesOrderService {
                 .mapToInt(WarehouseInventoryProjection::quantityHand)
                 .sum();
             System.out.println("totalAvailable :" +  totalAvailable);
-        //  Check if any warehouse can handle all
+
+        if (totalAvailable < quantityRequested || totalAvailable == 0) {
+            System.out.println("totalAvailable = " + totalAvailable + ", quantityRequested = " + quantityRequested);
+
+            return -1L;
+        }
         for (WarehouseInventoryProjection w : warehouses) {
             if (w.quantityHand() >= totalAvailable) {
                 System.out.println("warehouse Id that has all qauntity  : "+w.warehouseId());
@@ -166,9 +173,8 @@ public class SalesOrderService {
             }
         }
 
-        if (totalAvailable < quantityRequested) {
-            return -1L;
-        }
+
+
 
         //  Select main warehouse
         WarehouseInventoryProjection mainWarehouse = warehouses.stream()
@@ -274,6 +280,55 @@ public class SalesOrderService {
             order.setOrderStatus(OrderStatus.CANCELLED);
         }
          return salesOrderMapper.toDTO(salesOrderRepository.save(order));
+    }
+
+    @Transactional
+    public void reservedBackOrder(long warehouseId, List<Long> productIds) {
+
+        List<SalesOrder> backOrders =
+                salesOrderRepository.findByWarehouse_IdAndOrderStatus(
+                        warehouseId,
+                        OrderStatus.PARTIALLY_RESERVED
+                );
+
+        for (SalesOrder order : backOrders) {
+
+            for (SalesOrderLine line : order.getOrderLines()) {
+
+                // Skip lines whose product is not in the received list
+                if (!productIds.contains(line.getProduct().getId())) continue;
+
+                Inventory inventory = inventoryRepository
+                        .findByProductIdAndWarehouseId(line.getProduct().getId(), warehouseId)
+                        .orElseThrow(() -> new ResourceNotFoundException("Inventory not found"));
+
+                int available = inventory.getQuantityOnHand() - inventory.getQuantityReserved();
+
+                if (available >= line.getQuantityBackorder()) {
+
+                    inventory.setQuantityReserved(
+                            inventory.getQuantityReserved() + line.getQuantityBackorder()
+                    );
+
+                    line.setQuantityBackorder(0);
+                    line.setStatus(OrderLineStatus.RESERVED);
+
+                    inventoryRepository.save(inventory);
+                }
+            }
+
+            boolean allReserved = order.getOrderLines()
+                    .stream()
+                    .allMatch(l -> l.getStatus() == OrderLineStatus.RESERVED);
+
+            if (allReserved) {
+                order.setOrderStatus(OrderStatus.RESERVED);
+            } else {
+                order.setOrderStatus(OrderStatus.PARTIALLY_RESERVED);
+            }
+
+            salesOrderRepository.save(order);
+        }
     }
 
 

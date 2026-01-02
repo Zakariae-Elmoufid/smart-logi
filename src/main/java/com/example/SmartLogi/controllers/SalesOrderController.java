@@ -12,13 +12,13 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/api/sales-order")
+@RequestMapping("/api/")
 public class SalesOrderController {
 
     @Autowired
     private SalesOrderService salesOrderService;
 
-    @PostMapping
+    @PostMapping("client/salse-order")
     public ResponseEntity<ApiResponse> createOrder(@Valid @RequestBody SalesOrderRequestDTO dto) {
         SalesOrderResponseDTO salesOrder = salesOrderService.create(dto);
         ApiResponse response = ApiResponse.builder()
@@ -29,7 +29,7 @@ public class SalesOrderController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @GetMapping("/{id}/confirm")
+    @GetMapping("admin/salse-order/{id}/confirm")
     public ResponseEntity<ApiResponse> getSalesOrder(@Valid @PathVariable Long id){
         SalesOrderResponseDTO salesOrder = salesOrderService.confirmOrder(id);
         ApiResponse response = ApiResponse.builder()
@@ -40,7 +40,7 @@ public class SalesOrderController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @GetMapping("/{id}/cancel")
+    @GetMapping("admin/salse-order/{id}/cancel")
     public ResponseEntity<ApiResponse> canceledSalesOrder(@PathVariable Long id){
         SalesOrderResponseDTO salesOrder  = salesOrderService.cancel(id);
         ApiResponse response = ApiResponse.builder()

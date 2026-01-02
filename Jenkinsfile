@@ -57,11 +57,12 @@ pipeline {
                         -Dsonar.java.test.binaries=target/test-classes
                     '''
                 }
+
             }
         }
 
 
-         stage(' Quality Gate') {
+         stage('Quality Gate') {
                     steps {
                         timeout(time: 20, unit: 'MINUTES') {
                             waitForQualityGate abortPipeline: true
