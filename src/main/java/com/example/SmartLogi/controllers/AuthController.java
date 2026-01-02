@@ -6,7 +6,9 @@ import com.example.SmartLogi.entities.RefreshToken;
 import com.example.SmartLogi.services.ClientService;
 import com.example.SmartLogi.services.JwtService;
 import com.example.SmartLogi.services.RefreshTokenService;
+import com.example.SmartLogi.services.TokenBlacklistService;
 import com.example.SmartLogi.services.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +39,8 @@ public class AuthController {
     private JwtService jwtService;
     @Autowired
     private RefreshTokenService refreshTokenService;
+    @Autowired
+    private TokenBlacklistService tokenBlacklistService;
 
 
 
@@ -98,19 +102,24 @@ public class AuthController {
     }
 
     @PostMapping("/api/auth/logout")
-    public ResponseEntity<?> logout(@RequestBody Map<String, String> body) {
+    public ResponseEntity<?> logout(HttpServletRequest request, @RequestBody Map<String, String> body) {
+        // Blacklist the access token
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String accessToken = authHeader.substring(7);
+            tokenBlacklistService.blacklistToken(accessToken);
+        }
+
+        // Revoke the refresh token
         String refreshToken = body.get("refreshToken");
+        if (refreshToken != null) {
+            refreshTokenService.revoke(refreshToken);
+        }
 
-        refreshTokenService.revoke(refreshToken);
-
-        return ResponseEntity.ok("Logged out successfully");
+        return ResponseEntity.ok(Map.of(
+                "message", "Logged out successfully"
+        ));
     }
-
-
-
-
-
-
 
 
 }

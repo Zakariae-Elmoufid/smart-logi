@@ -1,6 +1,7 @@
 package com.example.SmartLogi.filter;
 
 import com.example.SmartLogi.services.JwtService;
+import com.example.SmartLogi.services.TokenBlacklistService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,11 +26,13 @@ public class JwtAuthFilter  extends OncePerRequestFilter {
 
     private final UserDetailsService userDetailsService;
     private final JwtService jwtService;
+    private final TokenBlacklistService tokenBlacklistService;
 
     @Autowired
-    public JwtAuthFilter(UserDetailsService userDetailsService, JwtService jwtService) {
+    public JwtAuthFilter(UserDetailsService userDetailsService, JwtService jwtService, TokenBlacklistService tokenBlacklistService) {
         this.userDetailsService = userDetailsService;
         this.jwtService = jwtService;
+        this.tokenBlacklistService = tokenBlacklistService;
     }
 
     @Override
@@ -47,6 +50,20 @@ public class JwtAuthFilter  extends OncePerRequestFilter {
         }
 
         if(username != null && SecurityContextHolder.getContext().getAuthentication()  == null){
+            // Check if token is blacklisted
+            if(tokenBlacklistService.isTokenBlacklisted(token)){
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+                response.getWriter().write("""
+                    {
+                      "status": 401,
+                      "error": "Unauthorized",
+                      "message": "Token has been invalidated"
+                    }
+                """);
+                return;
+            }
+
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
             if(jwtService.validateToken(token,userDetails)){
