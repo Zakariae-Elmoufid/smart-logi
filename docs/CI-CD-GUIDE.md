@@ -450,7 +450,7 @@ post {
 | ------------------- | ------------------------- |
 | **Build History**   | Job → Left sidebar        |
 | **Console Output**  | Build # → Console Output  |
-| **JaCoCo Coverage** | Build # → JaCoCo Coverage |
+| \*\*                | Build # → JaCoCo Coverage |
 | **Test Results**    | Build # → Test Result     |
 | **Artifacts (JAR)** | Build # → Build Artifacts |
 
