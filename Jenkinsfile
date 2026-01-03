@@ -8,6 +8,8 @@ pipeline {
 
 
 
+
+
     stages {
 
         stage('Checkout') {
@@ -76,17 +78,19 @@ pipeline {
                 archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
             }
         }
+
+
     }
 
     post {
         always {
-            echo "Build ${currentBuild.result} - ${env.JOB_NAME} #${env.BUILD_NUMBER}"
+          echo "Build ${currentBuild.result} - ${env.JOB_NAME} #${env.BUILD_NUMBER}"
         }
         success {
-            echo 'Pipeline exécuté avec succès!'
+            echo ' Pipeline successfully completed!'
         }
         failure {
-            echo 'Pipeline a échoué!'
+            echo ' Pipeline a échoué!'
         }
     }
 }
