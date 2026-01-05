@@ -1,6 +1,53 @@
 services:
+  # ===================== ELK STACK =====================
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.22
+    container_name: elasticsearch
+    environment:
+      - node.name=elasticsearch
+      - cluster.name=docker-cluster
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    networks:
+      - smartlogi-network
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.17.22
+    container_name: kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    networks:
+      - smartlogi-network
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:7.17.22
+    container_name: logstash
+    volumes:
+      - ./logstash/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+    ports:
+      - "5000:5000"
+    depends_on:
+      - elasticsearch
+    networks:
+      - smartlogi-network
+
+  # ===================== APP DATABASE =====================
   db:
     image: postgres:17
+    container_name: smartlogi-db
     restart: always
     environment:
       POSTGRES_USER: user
@@ -15,6 +62,7 @@ services:
 
   pgadmin:
     image: dpage/pgadmin4
+    container_name: pgadmin
     restart: always
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
@@ -24,9 +72,10 @@ services:
     networks:
       - smartlogi-network
 
-  # SonarQube Database (separate from app DB)
+  # ===================== SONARQUBE =====================
   sonarqube-db:
     image: postgres:15
+    container_name: sonarqube-db
     restart: always
     environment:
       POSTGRES_USER: sonar
@@ -37,9 +86,9 @@ services:
     networks:
       - smartlogi-network
 
-  # SonarQube Server
   sonarqube:
     image: sonarqube:lts-community
+    container_name: sonarqube
     restart: always
     depends_on:
       - sonarqube-db
@@ -56,9 +105,10 @@ services:
     networks:
       - smartlogi-network
 
-  # Jenkins Server
+  # ===================== JENKINS =====================
   jenkins:
     image: jenkins/jenkins:lts-jdk17
+    container_name: jenkins
     restart: always
     privileged: true
     user: root
@@ -73,11 +123,14 @@ services:
     networks:
       - smartlogi-network
 
+# ===================== NETWORK =====================
 networks:
   smartlogi-network:
     driver: bridge
 
+# ===================== VOLUMES =====================
 volumes:
+  es_data:
   postgres_data:
   sonarqube_db:
   sonarqube_data:

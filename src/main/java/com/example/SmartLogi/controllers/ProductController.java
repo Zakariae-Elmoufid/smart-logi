@@ -10,8 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @RestController
 @RequestMapping("/api/admin/products")
@@ -19,6 +20,9 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
+
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
+
 
 
     @PostMapping
@@ -39,7 +43,7 @@ public class ProductController {
         ApiResponse response =  ApiResponse.builder().message("All products")
                 .data(products)
                 .status(HttpStatus.OK.value()).build();
-
+        log.info("Test log INFO from SmartLogi");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
