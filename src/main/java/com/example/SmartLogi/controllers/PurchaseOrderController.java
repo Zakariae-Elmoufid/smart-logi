@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/purchase-orders")
+@RequestMapping("/api/manager/purchase-orders")
 public class PurchaseOrderController {
 
     @Autowired
@@ -59,7 +59,7 @@ public class PurchaseOrderController {
     public ResponseEntity<ApiResponse> approvePurchaseOrder(@PathVariable Long id) {
         PurchaseOrderResponseDTO oder = purchaseOrderService.approvePurchaseOrder(id);
         ApiResponse response = ApiResponse.builder()
-                .message("Purchase Order canceled successfully!")
+                .message("Purchase Order approve successfully!")
                 .status(HttpStatus.OK.value())
                 .data(oder)
                 .build();
@@ -67,12 +67,11 @@ public class PurchaseOrderController {
     }
 
         @PostMapping("/{poId}/receive")
-    public ResponseEntity<ApiResponse> receivePurchaseOrder(@PathVariable Long poId , @Valid @RequestBody ReceivePurchaseOrderRequestDTO dto) {
-         InventoryMovementResponseDTO inventoryMovement = purchaseOrderService.receiveProduct(poId,dto) ;
+    public ResponseEntity<ApiResponse> receivePurchaseOrder(@PathVariable Long poId) {
+          purchaseOrderService.receiveProduct(poId) ;
          ApiResponse response = ApiResponse.builder()
-                 .message("Product received successfully")
+                 .message("order received successfully")
                  .status(HttpStatus.OK.value())
-                 .data(inventoryMovement)
                  .build();
          return new ResponseEntity<>(response, HttpStatus.OK);
     }

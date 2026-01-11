@@ -74,7 +74,6 @@ public class ProductService {
     public ProductResponseDTO updateProduct(Long id, ProductRequestDTO dto) {
         Product product = repository.findById(id).orElseThrow(() -> new RuntimeException("Product not found"));
 
-
         product.setName(dto.name());
         product.setSku(dto.sku());
         product.setPurchasePrice(dto.purchasePrice());

@@ -40,7 +40,7 @@ public class WarehouseManagerService {
                  .password(PasswordUtils.hash(dto.password()))
                  .role(UserRole.WAREHOUSE_MANAGER)
                  .createdAt(LocalDateTime.now())
-                 .active(true)
+                 .enabled(true)
                  .build();
                     warehouses.stream().forEach(warehouse -> {
                      warehouseManager.addWarehouse(warehouse);
@@ -57,7 +57,7 @@ public class WarehouseManagerService {
          warehouseManager.setFirstName(dto.firstName());
          warehouseManager.setLastName(dto.lastName());
          warehouseManager.setEmail(dto.email());
-         warehouseManager.setActive(dto.active());
+         warehouseManager.setEnabled(dto.active());
          return managerMapper.toDTO(warehouseManagerRepository.save(warehouseManager));
      }
 
